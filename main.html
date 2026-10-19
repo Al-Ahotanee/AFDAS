@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AFDAS: Automated Fertilizer Distribution and Allocation System for Kano Agricultural Development Agency (KNARDA). Empowering Kano State farmers with blockchain transparency across all 44 LGAs.">
+    <meta name="keywords" content="KNARDA, Kano State, Fertilizer Distribution, AFDAS, Agritech, Blockchain, Dawanau, Rice Farming, Wheat Subsidy">
+    <meta name="author" content="Kano Agricultural Development Agency (KNARDA)">
+    <title>AFDAS - Kano Agricultural Development Agency (KNARDA) | Fertilizer Allocation</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kano: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#046A38',
+                            950: '#022c22'
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        heading: ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .hero-pattern {
+            background-color: #046A38;
+            background-image: radial-gradient(rgba(245, 158, 11, 0.15) 1px, transparent 0),
+                              linear-gradient(135deg, rgba(2, 44, 34, 0.95) 0%, rgba(4, 106, 56, 0.9) 100%),
+                              url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=1920&q=80');
+            background-size: 24px 24px, cover, cover;
+            background-position: center;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(4, 106, 56, 0.12);
+        }
+        .glow-kano {
+            box-shadow: 0 10px 30px -5px rgba(4, 106, 56, 0.3);
+        }
+        .glow-gold {
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-kano-900 selection:text-white">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-kano-950 text-gold-400 text-xs py-2 px-4 border-b border-kano-800/60">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-center md:text-left">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gold-500 text-kano-950 uppercase">Official</span>
+                <span class="font-medium">Kano State Agricultural and Rural Development Authority (KNARDA) &bull; Ministry of Agriculture</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-300 text-[11px]">
+                <span><i class="fas fa-check-circle text-gold-400 mr-1"></i> 2026 Dry-Season Subsidy Open</span>
+                <span class="hidden sm:inline">&bull;</span>
+                <span class="hidden sm:inline"><i class="fas fa-map-marker-alt text-gold-400 mr-1"></i> Coverage: All 44 Kano LGAs</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-kano-900 to-kano-700 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                    <i class="fas fa-seedling text-2xl text-gold-400"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-heading font-extrabold text-kano-900 tracking-tight">KNARDA</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-kano-100 text-kano-800 font-bold border border-kano-300">AFDAS</span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-slate-500 tracking-wide uppercase">Kano Agricultural Development Agency</p>
+                </div>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                <a href="#about" class="hover:text-kano-900 transition-colors">About AFDAS</a>
+                <a href="#zones" class="hover:text-kano-900 transition-colors">44 Kano LGAs</a>
+                <a href="#estimator" class="hover:text-kano-900 transition-colors">Allocation Estimator</a>
+                <a href="#blockchain" class="hover:text-kano-900 transition-colors">Blockchain Ledger</a>
+                <a href="#faq" class="hover:text-kano-900 transition-colors">Farmer Guidelines</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-3">
+                <a href="/app" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-kano-900 to-kano-700 hover:from-kano-950 hover:to-kano-800 transition-all shadow-md hover:shadow-lg glow-kano flex items-center gap-2">
+                    <i class="fas fa-lock text-gold-400"></i>
+                    <span>Access Portal</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern text-white pt-20 pb-28 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-kano-950/80 border border-gold-500/30 text-gold-400 text-xs font-bold uppercase tracking-wider">
+                        <i class="fas fa-shield-alt text-gold-400"></i>
+                        Zero Diversion &bull; 100% Traceable &bull; Algorithmic Allocation
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold leading-tight text-white">
+                        Automated Fertilizer Distribution &amp; Allocation System
+                    </h1>
+
+                    <p class="text-lg sm:text-xl text-slate-200 max-w-2xl font-normal leading-relaxed">
+                        A flagship initiative of the <strong class="text-gold-400">Kano Agricultural Development Agency (KNARDA)</strong> ensuring fair, transparent, and quota-optimized agricultural inputs across all <strong class="text-white">44 Local Government Areas</strong> of Kano State.
+                    </p>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="/app" class="w-full sm:w-auto px-8 py-4 rounded-xl font-heading font-bold text-base text-kano-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 transition-all transform hover:-translate-y-0.5 shadow-xl glow-gold flex items-center justify-center gap-3">
+                            <i class="fas fa-id-card"></i>
+                            <span>Farmer / Officer Portal</span>
+                        </a>
+                        <a href="#estimator" class="w-full sm:w-auto px-7 py-4 rounded-xl font-heading font-bold text-base text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-calculator text-gold-400"></i>
+                            <span>Check Quota Estimate</span>
+                        </a>
+                    </div>
+
+                    <!-- Credibility Badges -->
+                    <div class="pt-8 border-t border-white/10 grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-black/25 p-3 rounded-lg backdrop-blur-sm border border-white/5">
+                            <div class="text-2xl sm:text-3xl font-extrabold text-gold-400">44</div>
+                            <div class="text-xs text-slate-300 font-medium">Kano LGAs Covered</div>
+                        </div>
+                        <div class="bg-black/25 p-3 rounded-lg backdrop-blur-sm border border-white/5">
+                            <div class="text-2xl sm:text-3xl font-extrabold text-white">100K+</div>
+                            <div class="text-xs text-slate-300 font-medium">Bags Subsidized</div>
+                        </div>
+                        <div class="bg-black/25 p-3 rounded-lg backdrop-blur-sm border border-white/5">
+                            <div class="text-2xl sm:text-3xl font-extrabold text-gold-400">0%</div>
+                            <div class="text-xs text-slate-300 font-medium">Ghost Beneficiaries</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Interactive Card -->
+                <div class="lg:col-span-5">
+                    <div class="glass-card text-slate-900 rounded-3xl p-7 shadow-2xl relative border-2 border-kano-900/10">
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-kano-100 flex items-center justify-center text-kano-900 font-bold">
+                                    <i class="fas fa-qrcode text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-heading font-bold text-slate-900 text-base">Instant Voucher Verification</h3>
+                                    <p class="text-xs text-slate-500">Live validation against state blockchain</p>
+                                </div>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 animate-pulse"></span> Live API
+                            </span>
+                        </div>
+
+                        <!-- Live Verification Form -->
+                        <div class="mt-5 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Enter 6-Digit SMS Token or QR Hash</label>
+                                <div class="relative">
+                                    <input type="text" id="publicVerifyInput" placeholder="e.g. 549210 or paste SHA-256 hash" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-kano-900 focus:border-transparent text-sm font-mono font-medium">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fas fa-fingerprint"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button onclick="performPublicVerification()" class="w-full py-3.5 px-4 rounded-xl font-heading font-bold text-sm text-white bg-kano-900 hover:bg-kano-950 transition-colors flex items-center justify-center gap-2 shadow-md">
+                                <i class="fas fa-search"></i>
+                                <span>Verify Authenticity</span>
+                            </button>
+
+                            <div id="verifyResultCard" class="hidden rounded-xl p-4 text-xs space-y-2 border"></div>
+
+                            <!-- Sample Demo Tokens for instant test -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+                                <p class="font-semibold text-slate-700 mb-1"><i class="fas fa-info-circle text-kano-700 mr-1"></i> Quick Demo Verification:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="document.getElementById('publicVerifyInput').value='F001'; performPublicVerification();" class="px-2.5 py-1 bg-white hover:bg-kano-50 border border-slate-300 rounded text-[11px] font-mono text-kano-900">Farmer F001</button>
+                                    <button onclick="document.getElementById('publicVerifyInput').value='F002'; performPublicVerification();" class="px-2.5 py-1 bg-white hover:bg-kano-50 border border-slate-300 rounded text-[11px] font-mono text-kano-900">Farmer F002</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Kano 3 Senatorial Zones & 44 LGAs Coverage -->
+    <section id="zones" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-bold uppercase tracking-wider text-kano-900 bg-kano-100 px-3 py-1 rounded-full border border-kano-200">Statewide Agricultural Reach</span>
+                <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900 mt-3">Distribution Across Kano's 3 Agricultural Zones</h2>
+                <p class="text-slate-600 text-base mt-3">KNARDA coordinates distribution through designated regional depots to guarantee zero transport burden on rural farmers.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Kano Central Zone -->
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-7 hover:border-kano-700 hover:shadow-xl transition-all group">
+                    <div class="w-14 h-14 rounded-xl bg-kano-900 text-gold-400 flex items-center justify-center text-2xl mb-6 shadow-md">
+                        <i class="fas fa-warehouse"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-heading font-bold text-slate-900">Kano Central Zone</h3>
+                        <span class="text-xs font-bold text-kano-900 bg-kano-100 px-2.5 py-0.5 rounded-full">8 LGAs</span>
+                    </div>
+                    <p class="text-xs font-semibold text-gold-700 mt-1">Zonal Hub: Dawanau Central Grain Depot</p>
+                    <p class="text-sm text-slate-600 mt-3">Commercial hub and intensive peri-urban vegetable, tomato, and maize cultivation.</p>
+                    <div class="mt-5 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">LGAs Covered:</div>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Dala</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Fagge</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Gwale</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Kano Municipal</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Kumbotso</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Nassarawa</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Tarauni</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Ungogo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kano North Zone -->
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-7 hover:border-kano-700 hover:shadow-xl transition-all group">
+                    <div class="w-14 h-14 rounded-xl bg-kano-900 text-gold-400 flex items-center justify-center text-2xl mb-6 shadow-md">
+                        <i class="fas fa-wheat-awn"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-heading font-bold text-slate-900">Kano North Zone</h3>
+                        <span class="text-xs font-bold text-kano-900 bg-kano-100 px-2.5 py-0.5 rounded-full">13 LGAs</span>
+                    </div>
+                    <p class="text-xs font-semibold text-gold-700 mt-1">Zonal Hub: Bichi Agro-Distribution Depot</p>
+                    <p class="text-sm text-slate-600 mt-3">The grain, sorghum, millet, and dry-season wheat heartland of Northern Nigeria.</p>
+                    <div class="mt-5 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">LGAs Covered:</div>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Bagwai</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Bichi</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Danbatta</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Dawakin Tofa</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Gwarzo</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Kabo</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Kunchi</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Makoda</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Minjibir</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Shanono</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Tofa</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Tsanyawa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kano South Zone -->
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-7 hover:border-kano-700 hover:shadow-xl transition-all group">
+                    <div class="w-14 h-14 rounded-xl bg-kano-900 text-gold-400 flex items-center justify-center text-2xl mb-6 shadow-md">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-heading font-bold text-slate-900">Kano South Zone</h3>
+                        <span class="text-xs font-bold text-kano-900 bg-kano-100 px-2.5 py-0.5 rounded-full">23 LGAs</span>
+                    </div>
+                    <p class="text-xs font-semibold text-gold-700 mt-1">Zonal Hub: Rano & Kura Irrigation Depots</p>
+                    <p class="text-sm text-slate-600 mt-3">The premier rice irrigation basin (Kadawa/Kura Valley), sugarcane, and all-season grain basins.</p>
+                    <div class="mt-5 pt-4 border-t border-slate-200">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Major LGAs:</div>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Kura</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Rano</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Wudil</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Gaya</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Tudun Wada</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Bunkure</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Doguwa</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Madobi</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Sumaila</span>
+                            <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-medium">Albasu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quota & Eligibility Estimator -->
+    <section id="estimator" class="py-20 bg-slate-100 border-y border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-kano-100 flex items-center justify-center text-kano-900 font-bold text-xl">
+                        <i class="fas fa-calculator text-kano-900"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-heading font-extrabold text-slate-900">Algorithmic Quota Calculator</h3>
+                        <p class="text-xs text-slate-500">Estimate how many subsidized fertilizer bags you qualify for under KNARDA policy.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select Your LGA</label>
+                        <select id="calcLga" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-kano-900 text-sm font-medium">
+                            <option value="Danbatta">Danbatta (North)</option>
+                            <option value="Kura">Kura (South)</option>
+                            <option value="Bichi">Bichi (North)</option>
+                            <option value="Dala">Dala (Central)</option>
+                            <option value="Gaya">Gaya (South)</option>
+                            <option value="Rano">Rano (South)</option>
+                            <option value="Bagwai">Bagwai (North)</option>
+                            <option value="Kumbotso">Kumbotso (Central)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Farm Size (Hectares)</label>
+                        <input type="number" id="calcFarmSize" min="0.5" max="50" step="0.5" value="2.5" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-kano-900 text-sm font-medium">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Primary Crop Type</label>
+                        <select id="calcCrop" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-kano-900 text-sm font-medium">
+                            <option value="rice">Rice (Irrigation Priority)</option>
+                            <option value="wheat">Wheat (Dry Season)</option>
+                            <option value="maize">Maize & Sorghum</option>
+                            <option value="tomato">Tomato & Vegetables</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cooperative check -->
+                <div class="mt-6 flex items-center gap-3">
+                    <input type="checkbox" id="calcCoop" checked class="w-4 h-4 text-kano-900 rounded focus:ring-kano-900 border-slate-300">
+                    <label for="calcCoop" class="text-sm font-medium text-slate-700">I am a registered member of an accredited Kano Agricultural Cooperative Society (+1 bonus bag)</label>
+                </div>
+
+                <!-- Result Box -->
+                <div class="mt-8 bg-kano-50 border border-kano-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <div class="text-xs font-bold uppercase tracking-wider text-kano-900">Estimated State Subsidy Quota</div>
+                        <div class="text-3xl font-heading font-extrabold text-kano-950 mt-1" id="calcResultDisplay">6 Bags (50kg NPK/Urea)</div>
+                        <p class="text-xs text-slate-500 mt-1">Subsidy Rate: 50% state contribution with guaranteed genuine formulation</p>
+                    </div>
+                    <a href="/app" class="px-6 py-3 rounded-xl font-heading font-bold text-sm text-white bg-kano-900 hover:bg-kano-950 transition-all shadow-md shrink-0">
+                        Apply Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blockchain Transparency Section -->
+    <section id="blockchain" class="py-20 bg-slate-900 text-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="text-xs font-bold uppercase tracking-wider text-gold-400 bg-gold-400/10 px-3 py-1 rounded-full border border-gold-400/20">Cryptographic Integrity</span>
+                    <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-white">Immutable Ledger Guaranteeing Zero Fertilizer Diversion</h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Every allocation run and physical pickup is cryptographically sealed into a SHA-256 blockchain block. Once registered, records cannot be altered, forged, or claimed by unauthorized proxies.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-lg bg-kano-800 text-gold-400 flex items-center justify-center shrink-0 mt-1">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base">Cryptographic Block Linking</h4>
+                                <p class="text-xs text-slate-400">Each block cryptographically references the hash of the preceding block.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-lg bg-kano-800 text-gold-400 flex items-center justify-center shrink-0 mt-1">
+                                <i class="fas fa-user-lock"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base">NIN &amp; Biometric Anti-Fraud</h4>
+                                <p class="text-xs text-slate-400">Restricts allocations to one verified farmer per National Identity Number.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-lg bg-kano-800 text-gold-400 flex items-center justify-center shrink-0 mt-1">
+                                <i class="fas fa-sms"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white text-base">Rural SMS Token Integration</h4>
+                                <p class="text-xs text-slate-400">Farmers without smartphones receive cryptographic 6-digit SMS tokens.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6">
+                    <div class="bg-slate-950 rounded-3xl p-6 border border-slate-800 font-mono text-xs text-slate-300 shadow-2xl">
+                        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800 text-slate-400">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                                <span class="ml-2 text-slate-200 font-bold">knarda_distribution_chain.json</span>
+                            </div>
+                            <span class="text-emerald-400 font-bold">SHA-256 VERIFIED</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-gold-400 font-bold">BLOCK #1 &bull; ALGORITHMIC_ALLOCATION</span>
+                                <div class="text-[11px] text-slate-400 mt-1">Hash: <span class="text-emerald-400">9f83c18b76a0842e47...c13e</span></div>
+                                <div class="text-[11px] text-slate-400">Prev: <span class="text-slate-500">000000000000000000...0000 (GENESIS)</span></div>
+                                <div class="text-[11px] text-slate-300 mt-1">Zone: Kano North (Danbatta, Bichi) &bull; Bags: 10,000 NPK</div>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                                <span class="text-gold-400 font-bold">BLOCK #2 &bull; DISTRIBUTION_EXECUTION</span>
+                                <div class="text-[11px] text-slate-400 mt-1">Hash: <span class="text-emerald-400">4c67a32d18e95bf019...88fa</span></div>
+                                <div class="text-[11px] text-slate-400">Prev: <span class="text-slate-500">9f83c18b76a0842e47...c13e</span></div>
+                                <div class="text-[11px] text-slate-300 mt-1">Depot: Dawanau Central &bull; Officer: S001 &bull; Recipient: F001</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <a href="/app" class="text-gold-400 hover:text-gold-300 font-bold text-xs underline">Open Live Explorer in Dashboard &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-kano-950 text-slate-400 text-xs py-12 border-t border-kano-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="md:col-span-2 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-kano-900 flex items-center justify-center text-gold-400">
+                        <i class="fas fa-seedling text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="text-lg font-heading font-bold text-white">KNARDA &bull; AFDAS</span>
+                        <p class="text-[11px] text-slate-400">Kano Agricultural Development Agency</p>
+                    </div>
+                </div>
+                <p class="text-slate-400 max-w-md text-xs leading-relaxed">
+                    Automated Fertilizer Distribution and Allocation System. Committed to transparency, food security, and smallholder empowerment across all 44 Local Government Areas of Kano State.
+                </p>
+                <div class="text-slate-500 text-[11px]">
+                    &copy; 2026 Kano State Government of Nigeria. All Rights Reserved.
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-sm mb-3">Zonal Depots</h4>
+                <ul class="space-y-2">
+                    <li>&bull; Dawanau Central Grain Depot, Kano</li>
+                    <li>&bull; Bichi Agro-Distribution Depot, Bichi</li>
+                    <li>&bull; Rano Zonal Input Depot, Rano</li>
+                    <li>&bull; Kura Valley Irrigation Center, Kura</li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-sm mb-3">Portal Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="/app" class="hover:text-gold-400">Farmer Registration</a></li>
+                    <li><a href="/app" class="hover:text-gold-400">Store Officer Scanner</a></li>
+                    <li><a href="/app" class="hover:text-gold-400">Administrator Console</a></li>
+                    <li><a href="/health" class="hover:text-gold-400">API Health Status</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Public Verification Script & Calculator Script -->
+    <script>
+        function updateQuota() {
+            const farmSize = parseFloat(document.getElementById('calcFarmSize').value) || 1.0;
+            const crop = document.getElementById('calcCrop').value;
+            const hasCoop = document.getElementById('calcCoop').checked;
+            
+            let multiplier = (crop === 'rice' || crop === 'wheat') ? 1.2 : 1.0;
+            let allocated = Math.round(farmSize * 2.0 * multiplier);
+            if (hasCoop) allocated += 1;
+            allocated = Math.max(1, Math.min(allocated, 12));
+            
+            document.getElementById('calcResultDisplay').innerText = `${allocated} Bags (50kg NPK/Urea)`;
+        }
+
+        document.getElementById('calcFarmSize').addEventListener('input', updateQuota);
+        document.getElementById('calcCrop').addEventListener('change', updateQuota);
+        document.getElementById('calcCoop').addEventListener('change', updateQuota);
+
+        async function performPublicVerification() {
+            const input = document.getElementById('publicVerifyInput').value.trim();
+            const card = document.getElementById('verifyResultCard');
+            if (!input) {
+                alert('Please enter a 6-digit SMS token or QR hash');
+                return;
+            }
+
+            card.className = 'rounded-xl p-4 text-xs space-y-2 border bg-slate-50 text-slate-700 block';
+            card.innerHTML = '<div class="text-center py-2"><i class="fas fa-spinner fa-spin text-kano-900 mr-2"></i> Querying KNARDA Blockchain Ledger...</div>';
+
+            try {
+                const res = await fetch('/api/verify_qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: input, qr_data: input })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.valid) {
+                    const statusColor = data.already_distributed ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800';
+                    const statusText = data.already_distributed ? 'COLLECTED / DISPENSED' : 'ALLOCATED / READY FOR PICKUP';
+
+                    card.className = 'rounded-xl p-4 text-xs space-y-2 border border-emerald-300 bg-emerald-50 text-emerald-950 block';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between pb-2 border-b border-emerald-200">
+                            <strong class="text-sm font-heading text-emerald-900">VERIFIED VALID ALLOCATION</strong>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColor}">${statusText}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-slate-700 mt-2">
+                            <div><span class="text-slate-500">Beneficiary:</span> <strong>${data.farmer_name}</strong></div>
+                            <div><span class="text-slate-500">Farmer ID:</span> <strong>${data.farmer_id}</strong></div>
+                            <div><span class="text-slate-500">LGA:</span> <strong>${data.lga} (${data.ward})</strong></div>
+                            <div><span class="text-slate-500">Quota:</span> <strong class="text-kano-900">${data.allocated_bags} Bags</strong></div>
+                        </div>
+                        <div class="pt-2 border-t border-emerald-200 text-[11px] text-slate-600">
+                            <strong>Season:</strong> ${data.season_name} (${data.fertilizer_type})
+                        </div>
+                    `;
+                } else {
+                    card.className = 'rounded-xl p-4 text-xs space-y-2 border border-red-300 bg-red-50 text-red-900 block';
+                    card.innerHTML = `
+                        <div class="font-bold"><i class="fas fa-times-circle text-red-600 mr-1"></i> Invalid Record</div>
+                        <p class="text-slate-600">${data.message || 'No match found in the KNARDA registry.'}</p>
+                    `;
+                }
+            } catch (err) {
+                card.className = 'rounded-xl p-4 text-xs space-y-2 border border-red-300 bg-red-50 text-red-900 block';
+                card.innerHTML = `<div class="font-bold text-red-600">Network Error: Could not connect to verification server.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
