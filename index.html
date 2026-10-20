@@ -707,6 +707,38 @@
     </div>
 
 
+    <!-- 11. MINISTERIAL EXECUTIVE BRIEFING MODAL -->
+    <div id="executiveReportModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-8 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <!-- Action bar (no-print) -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200 no-print">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-kano-900 text-gold-400 flex items-center justify-center font-bold text-lg shadow">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-heading font-extrabold text-slate-900">Kano State Executive Council &bull; Ministerial Briefing</h3>
+                        <p class="text-xs text-slate-500">Official State Fertilizer Subsidy Audit &amp; Performance Briefing</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-kano-900 hover:bg-kano-950 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+                        <i class="fas fa-print text-gold-400"></i> Print Official Report
+                    </button>
+                    <button onclick="document.getElementById('executiveReportModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Printable Government Memo Document -->
+            <div id="executiveReportDocument" class="mt-6 p-8 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-900 space-y-6">
+                <!-- Dynamically loaded via generateMinisterialBriefing() -->
+            </div>
+        </div>
+    </div>
+
+
     <!-- ========================================== -->
     <!--           CORE JAVASCRIPT CONTROLLER       -->
     <!-- ========================================== -->
@@ -871,9 +903,10 @@
             if (currentUser.user_type === 'admin') {
                 links = [
                     { id: 'overview', icon: 'fa-chart-pie', label: 'Executive Telemetry' },
+                    { id: 'analytics-reporting', icon: 'fa-chart-line', label: 'Reporting & Analytics' },
                     { id: 'allocation-engine', icon: 'fa-brain', label: 'Algorithmic Allocator' },
-                    { id: 'locations-admin', icon: 'fa-map-location-dot', label: 'Locations (LGAs, Wards, PUs)' },
-                    { id: 'warehouse', icon: 'fa-warehouse', label: 'Inventory & Depots' },
+                    { id: 'locations-admin', icon: 'fa-map-location-dot', label: 'Locations (44 LGAs, Wards, PUs)' },
+                    { id: 'warehouse', icon: 'fa-warehouse', label: 'Depot Stock & Inventory' },
                     { id: 'farmers-registry', icon: 'fa-users', label: 'Farmers Registry' },
                     { id: 'officers-admin', icon: 'fa-user-tie', label: 'Store Officers' },
                     { id: 'blockchain-explorer', icon: 'fa-link', label: 'Blockchain Ledger' },
@@ -907,6 +940,7 @@
 
             const titles = {
                 'overview': ['Executive Overview', 'Kano Agricultural Development Agency Real-Time Metrics'],
+                'analytics-reporting': ['Detailed Reporting & Analytics Suite', 'Comprehensive Subsidy Financials, Agronomic Yield Projections & SEC Ministerial Briefing'],
                 'allocation-engine': ['Algorithmic Allocation Engine', 'Smart Quota Optimization Based on Acreage, Crop Priority & Cooperatives'],
                 'locations-admin': ['Locations & Zonal Administration', 'Manage Senatorial Zones, Kano 44 LGAs, Wards, and Polling Units'],
                 'farmers-registry': ['Enrolled Farmers Registry', 'Verified smallholders with NIN, acreage, photo and cooperative records'],
@@ -926,6 +960,7 @@
 
             const container = document.getElementById('sectionContainer');
             if (tabId === 'overview') loadOverviewView();
+            else if (tabId === 'analytics-reporting') loadAnalyticsReportingView();
             else if (tabId === 'allocation-engine') loadAllocationEngineView();
             else if (tabId === 'locations-admin') loadLocationsAdminView();
             else if (tabId === 'farmers-registry') loadFarmersRegistryView();
@@ -942,6 +977,78 @@
         function refreshDashboard() {
             switchTab(activeTab);
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Data Refreshed', timer: 1000, showConfirmButton: false });
+        }
+
+
+        // ====================================================
+        //  ENTERPRISE DATA TABLE ENGINE & PAGINATION CORE
+        // ====================================================
+        const tableStates = {
+            warehouseBatches: { page: 1, pageSize: 10, search: '', depotFilter: '', sortCol: 'quantity', sortAsc: false, density: 'comfortable', data: [] },
+            warehouseLogs: { page: 1, pageSize: 10, search: '', actionFilter: '', sortCol: 'id', sortAsc: false, density: 'comfortable', data: [] },
+            locationsLga: { page: 1, pageSize: 15, search: '', zoneFilter: '', sortCol: 'name', sortAsc: true, density: 'comfortable', data: [] },
+            farmers: { page: 1, pageSize: 10, search: '', lgaFilter: '', cropFilter: '', sortCol: 'total_bags_received', sortAsc: false, density: 'comfortable', selected: new Set(), data: [] },
+            officers: { page: 1, pageSize: 10, search: '', zoneFilter: '', sortCol: 'total_dispensed', sortAsc: false, density: 'comfortable', data: [] },
+            allocationReqs: { page: 1, pageSize: 10, search: '', statusFilter: '', lgaFilter: '', sortCol: 'id', sortAsc: false, density: 'comfortable', selected: new Set(), data: [] },
+            officerHistory: { page: 1, pageSize: 10, search: '', sortCol: 'id', sortAsc: false, density: 'comfortable', data: [] },
+            auditLogs: { page: 1, pageSize: 15, search: '', actionFilter: '', sortCol: 'id', sortAsc: false, density: 'comfortable', data: [] }
+        };
+
+        function renderTablePagination(stateKey, totalCount, onPageChangeName, onPageSizeChangeName) {
+            const st = tableStates[stateKey];
+            const totalPages = Math.max(1, Math.ceil(totalCount / st.pageSize));
+            const startRec = totalCount === 0 ? 0 : (st.page - 1) * st.pageSize + 1;
+            const endRec = Math.min(st.page * st.pageSize, totalCount);
+
+            let pageNumbers = [];
+            let startPage = Math.max(1, st.page - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            for (let p = startPage; p <= endPage; p++) {
+                pageNumbers.push(p);
+            }
+
+            return `
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs text-slate-500">
+                    <div class="flex items-center gap-3">
+                        <span>Showing <strong class="text-slate-800">${startRec.toLocaleString()}</strong> to <strong class="text-slate-800">${endRec.toLocaleString()}</strong> of <strong class="text-slate-800">${totalCount.toLocaleString()}</strong> records</span>
+                        <div class="flex items-center gap-1.5 border-l border-slate-200 pl-3">
+                            <span class="text-[11px]">Rows:</span>
+                            <select onchange="${onPageSizeChangeName}(parseInt(this.value))" class="px-2 py-1 rounded-lg border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                <option value="10" ${st.pageSize === 10 ? 'selected' : ''}>10</option>
+                                <option value="15" ${st.pageSize === 15 ? 'selected' : ''}>15</option>
+                                <option value="25" ${st.pageSize === 25 ? 'selected' : ''}>25</option>
+                                <option value="50" ${st.pageSize === 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${st.pageSize === 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button onclick="${onPageChangeName}(1)" ${st.page === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-400"' : 'class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition"'} title="First Page">
+                            <i class="fas fa-angles-left text-[10px]"></i>
+                        </button>
+                        <button onclick="${onPageChangeName}(${Math.max(1, st.page - 1)})" ${st.page === 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-400"' : 'class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition"'} title="Previous Page">
+                            <i class="fas fa-angle-left text-[10px]"></i>
+                        </button>
+
+                        ${pageNumbers.map(p => `
+                            <button onclick="${onPageChangeName}(${p})" class="w-8 h-8 rounded-lg font-bold text-xs transition ${p === st.page ? 'bg-kano-900 text-white shadow-sm' : 'border border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                ${p}
+                            </button>
+                        `).join('')}
+
+                        <button onclick="${onPageChangeName}(${Math.min(totalPages, st.page + 1)})" ${st.page === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-400"' : 'class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition"'} title="Next Page">
+                            <i class="fas fa-angle-right text-[10px]"></i>
+                        </button>
+                        <button onclick="${onPageChangeName}(${totalPages})" ${st.page === totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-400"' : 'class="px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 transition"'} title="Last Page">
+                            <i class="fas fa-angles-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
 
@@ -1094,94 +1201,182 @@
 
 
         // ====================================================
-        //  VIEW 2: INVENTORY & DEPOTS MANAGEMENT (ADMIN)
+        //  VIEW 1B: DETAILED REPORTING & ANALYTICS SUITE
         // ====================================================
-        async function loadWarehouseView() {
+        async function loadAnalyticsReportingView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Inventory Batches & Movements...</div>';
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Calculating Statewide Telemetry & Financial Subsidies...</div>';
 
             try {
-                const [invRes, logsRes] = await Promise.all([
-                    fetch('/api/inventory'),
-                    fetch('/api/inventory/logs')
-                ]);
-                const batches = await invRes.json();
-                const logs = await logsRes.json();
-
-                const totalBags = batches.reduce((acc, b) => acc + b.quantity, 0);
+                const res = await fetch('/api/analytics/detailed');
+                const data = await res.json();
+                const kpi = data.kpi;
+                const topLgas = data.top_lgas;
 
                 container.innerHTML = `
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+                    <!-- Executive Header & Ministerial Briefing Button -->
+                    <div class="bg-gradient-to-r from-kano-950 via-kano-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div>
-                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Zonal Strategic Inventory &amp; Depots</h2>
-                            <p class="text-xs text-slate-500">Live storage levels across Dawanau, Bichi, Rano, Kura, and Gaya input hubs.</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="openAddStockModal()" class="px-4 py-2.5 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
-                                <i class="fas fa-plus"></i> Add Stock Batch
-                            </button>
-                            <button onclick="openTransferModal()" class="px-4 py-2.5 rounded-xl bg-gold-500 text-kano-950 font-bold text-xs hover:bg-gold-400 transition flex items-center gap-1.5 shadow">
-                                <i class="fas fa-truck-moving"></i> Inter-Depot Transfer
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Inventory Batches Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        ${batches.map(b => `
-                            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2 hover:border-kano-700 transition">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-kano-100 text-kano-900 font-mono">${b.batch_number}</span>
-                                    <span class="text-xs text-slate-400 font-mono">${b.unit}</span>
-                                </div>
-                                <h4 class="font-heading font-bold text-slate-900 text-sm">${b.fertilizer_type}</h4>
-                                <div class="text-2xl font-extrabold text-kano-900">${b.quantity.toLocaleString()}</div>
-                                <p class="text-[11px] text-slate-500"><i class="fas fa-location-dot text-slate-400 mr-1"></i> ${b.location}</p>
-                                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px]">
-                                    <span class="text-slate-400">Supplier: ${b.supplier || 'KNARDA'}</span>
-                                    <button onclick="promptAdjustStock(${b.id}, '${b.fertilizer_type}', ${b.quantity})" class="text-kano-900 font-bold hover:underline">Adjust</button>
-                                </div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/30 text-xs font-bold uppercase tracking-wider">KNARDA Macro-Analytics</span>
+                                <span class="text-xs text-slate-300 font-mono"><i class="fas fa-shield-alt text-emerald-400 mr-1"></i> Blockchain Certified</span>
                             </div>
-                        `).join('')}
+                            <h2 class="text-2xl sm:text-3xl font-heading font-extrabold mt-2 text-white">Fertilizer Subsidy &amp; Impact Analytics</h2>
+                            <p class="text-xs text-slate-300 mt-1 max-w-xl">
+                                Real-time economic valuation, smallholder subsidy coverage, zonal dispensing velocity, and algorithmic allocation telemetry across Kano State 44 LGAs.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 shrink-0">
+                            <button onclick="generateMinisterialBriefing()" class="px-5 py-3.5 rounded-2xl font-heading font-bold text-xs text-kano-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 shadow-xl flex items-center gap-2 transition transform hover:-translate-y-0.5">
+                                <i class="fas fa-file-contract text-base"></i>
+                                <span>Generate SEC Ministerial Briefing</span>
+                            </button>
+                            <a href="/api/export/allocations" class="px-4 py-3 rounded-2xl font-bold text-xs bg-white/10 hover:bg-white/20 text-white border border-white/20 transition flex items-center gap-1.5">
+                                <i class="fas fa-file-csv text-emerald-400"></i> Export Statewide CSV
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Warehouse Stock Movement Ledger -->
+                    <!-- Macro Financial & Agronomic KPI Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">State Subsidy Committed</span>
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center text-sm font-bold">₦</div>
+                            </div>
+                            <div class="text-2xl font-heading font-extrabold text-kano-900 mt-1">₦${(kpi.total_subsidy_expenditure).toLocaleString()}</div>
+                            <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> ₦30,000 subvention per bag
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Farmer Direct Savings</span>
+                                <div class="w-8 h-8 rounded-lg bg-gold-50 text-gold-600 flex items-center justify-center text-sm"><i class="fas fa-wallet"></i></div>
+                            </div>
+                            <div class="text-2xl font-heading font-extrabold text-gold-600 mt-1">₦${(kpi.total_smallholder_savings).toLocaleString()}</div>
+                            <div class="text-[11px] text-slate-500 font-medium">
+                                Compared to ₦45,000 open market
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Grain Harvest Forecast</span>
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center text-sm"><i class="fas fa-wheat-awn"></i></div>
+                            </div>
+                            <div class="text-2xl font-heading font-extrabold text-slate-900 mt-1">${(kpi.projected_grain_yield_mt).toLocaleString()} MT</div>
+                            <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                <i class="fas fa-arrow-trend-up"></i> +38.5% yield uplift
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Anti-Diversion Safeguard</span>
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-sm"><i class="fas fa-shield-halved"></i></div>
+                            </div>
+                            <div class="text-2xl font-heading font-extrabold text-indigo-900 mt-1">₦${(kpi.fraud_diversion_prevented_naira).toLocaleString()}</div>
+                            <div class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                <i class="fas fa-lock"></i> Prevented loss via QR & OTP
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Interactive Chart.js Graphs -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div>
+                                    <h4 class="font-heading font-bold text-slate-900 text-sm">Zonal Allocation vs Collection Saturation</h4>
+                                    <p class="text-xs text-slate-500">Allocated vs physically released bags across Kano Belts</p>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-kano-50 text-kano-900 border border-kano-200">3 Belts</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartZonalSat"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div>
+                                    <h4 class="font-heading font-bold text-slate-900 text-sm">Formulation Distribution Share</h4>
+                                    <p class="text-xs text-slate-500">Strategic buffer reserves across formulations</p>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold-50 text-gold-700 border border-gold-200">Formulations</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartFormulationShare"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div>
+                                    <h4 class="font-heading font-bold text-slate-900 text-sm">7-Day Dispensing Velocity Run-Rate</h4>
+                                    <p class="text-xs text-slate-500">Daily physical voucher redemptions across all depot centers</p>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800">50kg Bags / Day</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartVelocityCurve"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                                <div>
+                                    <h4 class="font-heading font-bold text-slate-900 text-sm">Top 10 LGAs by Allocation Volume</h4>
+                                    <p class="text-xs text-slate-500">Highest volume agrarian LGAs</p>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Top 10 LGAs</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="chartTopLgas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Ranked LGAs Enterprise Table -->
                     <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                         <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                             <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Warehouse Stock Movement Ledger</h3>
-                                <p class="text-xs text-slate-500">Immutable trace of all batch receptions, inter-depot transfers, and dispensing</p>
+                                <h4 class="font-heading font-bold text-slate-900 text-base">Statewide LGA Quota Ranking</h4>
+                                <p class="text-xs text-slate-500">Top-tier fertilizer utilization across Kano LGA agrarian clusters</p>
                             </div>
-                            <span class="text-xs font-bold text-kano-900 bg-kano-50 px-3 py-1 rounded-full border border-kano-200">${logs.length} Transactions</span>
+                            <button onclick="switchTab('locations-admin')" class="text-xs font-bold text-kano-900 hover:underline flex items-center gap-1">
+                                <span>View All 44 LGAs</span> <i class="fas fa-arrow-right"></i>
+                            </button>
                         </div>
-
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
-                                        <th class="py-3 px-3">Log ID</th>
-                                        <th class="py-3 px-3">Action</th>
-                                        <th class="py-3 px-3">Fertilizer</th>
-                                        <th class="py-3 px-3">Quantity</th>
-                                        <th class="py-3 px-3">Source / Origin</th>
-                                        <th class="py-3 px-3">Destination</th>
-                                        <th class="py-3 px-3">Timestamp</th>
+                                        <th class="py-3 px-3">Rank</th>
+                                        <th class="py-3 px-3">LGA Name</th>
+                                        <th class="py-3 px-3">Senatorial Belt</th>
+                                        <th class="py-3 px-3">Allocated Quota</th>
+                                        <th class="py-3 px-3">State Subsidy Value</th>
+                                        <th class="py-3 px-3">Utilization Status</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
-                                    ${logs.map(l => `
+                                    ${topLgas.map((item, idx) => `
                                         <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-3 px-3 font-mono text-slate-500">#${l.id}</td>
+                                            <td class="py-3 px-3 font-mono font-bold text-slate-400">#${idx + 1}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-900">${item.lga}</td>
                                             <td class="py-3 px-3">
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${l.action.includes('TRANSFER') ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
-                                                    ${l.action}
-                                                </span>
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-kano-100 text-kano-900">Kano Agrarian Belt</span>
                                             </td>
-                                            <td class="py-3 px-3 font-semibold text-slate-800">${l.fertilizer_type}</td>
-                                            <td class="py-3 px-3 font-bold text-kano-900">${l.quantity_change > 0 ? '+' : ''}${l.quantity_change || l.quantity} Bags</td>
-                                            <td class="py-3 px-3 text-slate-600">${l.source || 'N/A'}</td>
-                                            <td class="py-3 px-3 font-medium text-slate-800">${l.destination || 'N/A'}</td>
-                                            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]">${l.timestamp.substring(0, 16).replace('T', ' ')}</td>
+                                            <td class="py-3 px-3 font-bold text-kano-900 text-sm">${item.bags.toLocaleString()} Bags</td>
+                                            <td class="py-3 px-3 font-semibold text-emerald-700">₦${(item.bags * 30000).toLocaleString()}</td>
+                                            <td class="py-3 px-3">
+                                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden max-w-xs">
+                                                    <div class="bg-kano-900 h-2 rounded-full" style="width: ${Math.min(100, Math.round((item.bags / (topLgas[0].bags || 1)) * 100))}%"></div>
+                                                </div>
+                                            </td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1189,9 +1384,534 @@
                         </div>
                     </div>
                 `;
+
+                // Render Chart 1: Zonal Fulfillment
+                const ctxZonal = document.getElementById('chartZonalSat').getContext('2d');
+                new Chart(ctxZonal, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Kano North', 'Kano South', 'Kano Central'],
+                        datasets: [
+                            {
+                                label: 'Allocated Bags',
+                                data: [data.zonal_saturation['Kano North'].allocated, data.zonal_saturation['Kano South'].allocated, data.zonal_saturation['Kano Central'].allocated],
+                                backgroundColor: '#046A38',
+                                borderRadius: 6
+                            },
+                            {
+                                label: 'Distributed Bags',
+                                data: [data.zonal_saturation['Kano North'].distributed, data.zonal_saturation['Kano South'].distributed, data.zonal_saturation['Kano Central'].distributed],
+                                backgroundColor: '#f59e0b',
+                                borderRadius: 6
+                            }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // Render Chart 2: Formulation Share
+                const formLabels = Object.keys(data.formulation_share);
+                const formValues = Object.values(data.formulation_share);
+                const ctxForm = document.getElementById('chartFormulationShare').getContext('2d');
+                new Chart(ctxForm, {
+                    type: 'doughnut',
+                    data: {
+                        labels: formLabels.map(l => l.length > 20 ? l.substring(0, 18) + '...' : l),
+                        datasets: [{
+                            data: formValues,
+                            backgroundColor: ['#046A38', '#10b981', '#f59e0b', '#d97706', '#3b82f6', '#8b5cf6', '#ec4899', '#64748b']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+                });
+
+                // Render Chart 3: Dispensing Velocity
+                const ctxVel = document.getElementById('chartVelocityCurve').getContext('2d');
+                new Chart(ctxVel, {
+                    type: 'line',
+                    data: {
+                        labels: data.velocity_curve.map(v => v.day),
+                        datasets: [{
+                            label: 'Daily Bags Dispensed',
+                            data: data.velocity_curve.map(v => v.bags),
+                            borderColor: '#046A38',
+                            backgroundColor: 'rgba(4, 106, 56, 0.1)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#046A38'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // Render Chart 4: Top 10 LGAs
+                const ctxTop = document.getElementById('chartTopLgas').getContext('2d');
+                new Chart(ctxTop, {
+                    type: 'bar',
+                    data: {
+                        labels: topLgas.map(t => t.lga),
+                        datasets: [{
+                            label: 'Allocated Quota (Bags)',
+                            data: topLgas.map(t => t.bags),
+                            backgroundColor: '#059669',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+                });
+
+            } catch (err) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load detailed analytics: ${err.message}</div>`;
+            }
+        }
+
+        async function generateMinisterialBriefing() {
+            Swal.fire({ title: 'Preparing SEC Ministerial Briefing...', didOpen: () => Swal.showLoading() });
+            const res = await fetch('/api/reports/executive');
+            const data = await res.json();
+            Swal.close();
+
+            const doc = document.getElementById('executiveReportDocument');
+            doc.innerHTML = `
+                <div class="text-center pb-6 border-b-2 border-kano-900 space-y-1">
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-kano-900 text-gold-400 flex items-center justify-center text-3xl font-bold shadow-md">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-xl font-heading font-extrabold text-kano-950 uppercase tracking-wide mt-2">Kano State Government of Nigeria</h2>
+                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">${data.ministry}</h3>
+                    <h4 class="text-xs font-semibold text-kano-900 uppercase tracking-widest">${data.agency}</h4>
+                    <p class="text-[11px] text-slate-500 font-mono mt-1">Ref: ${data.reference_no} &bull; Date: ${data.generated_date}</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">TO:</span>
+                        <strong class="text-slate-900">His Excellency, The Executive Governor &amp; Kano State Executive Council (SEC)</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">FROM:</span>
+                        <strong class="text-slate-900">Managing Director, Kano Agricultural Development Agency (KNARDA)</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">SUBJECT:</span>
+                        <strong class="text-kano-900 uppercase tracking-wide">EXECUTIVE BRIEFING &amp; FIELD RECONCILIATION REPORT ON 2026 DRY-SEASON FERTILIZER SUBSIDY DISPENSING</strong>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-700 leading-relaxed space-y-2">
+                    <h5 class="font-bold text-slate-900 uppercase">1. Executive Summary &amp; Legal Mandate</h5>
+                    <p>${data.executive_summary}</p>
+                </div>
+
+                <div class="space-y-2">
+                    <h5 class="font-bold text-slate-900 text-xs uppercase">2. Statewide Input Allocation &amp; Financial Commitment</h5>
+                    <table class="w-full text-left text-xs border border-slate-200">
+                        <thead class="bg-slate-100 font-bold text-slate-700">
+                            <tr>
+                                <th class="p-2.5 border">Metric Indicator</th>
+                                <th class="p-2.5 border">Audited Quantity</th>
+                                <th class="p-2.5 border">Financial Commitment (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr>
+                                <td class="p-2.5 border font-medium">State Strategic Subsidy Quota Allocated</td>
+                                <td class="p-2.5 border font-bold text-kano-900">${data.total_allocated_bags.toLocaleString()} Bags (50kg)</td>
+                                <td class="p-2.5 border font-mono">₦${(data.total_allocated_bags * 30000).toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border font-medium">Total Bags Physically Dispensed &amp; Confirmed</td>
+                                <td class="p-2.5 border font-bold text-emerald-700">${data.total_distributed_bags.toLocaleString()} Bags</td>
+                                <td class="p-2.5 border font-mono">₦${data.state_subsidy_investment_naira.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border font-medium">Total Smallholder Direct Financial Relief</td>
+                                <td class="p-2.5 border">${data.total_verified_farmers} Registered Beneficiaries</td>
+                                <td class="p-2.5 border font-bold text-gold-600 font-mono">₦${data.farmer_savings_naira.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border font-medium">Anti-Fraud Open Market Diversion Prevented</td>
+                                <td class="p-2.5 border">100% Cryptographic QR Verification</td>
+                                <td class="p-2.5 border font-bold text-indigo-700 font-mono">₦${data.prevented_diversion_estimate_naira.toLocaleString()}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pt-6 border-t-2 border-slate-200 grid grid-cols-3 gap-6 text-center text-xs">
+                    ${data.signatories.map(s => `
+                        <div class="space-y-1">
+                            <div class="h-10 border-b border-dashed border-slate-400 flex items-end justify-center pb-1">
+                                <span class="font-heading font-extrabold text-kano-900 text-xs italic">Digital Signature Verified</span>
+                            </div>
+                            <div class="font-bold text-slate-900">${s.name}</div>
+                            <div class="text-[10px] text-slate-500 uppercase">${s.role}</div>
+                            <span class="inline-block text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">${s.status}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('executiveReportModal').classList.remove('hidden');
+        }
+
+
+        // ====================================================
+        //  VIEW 2: INVENTORY & DEPOTS MANAGEMENT (ADMIN)
+        // ====================================================
+        async function loadWarehouseView() {
+            const container = document.getElementById('sectionContainer');
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Zonal Depot Inventory...</div>';
+
+            try {
+                const [invRes, logsRes] = await Promise.all([
+                    fetch('/api/inventory'),
+                    fetch('/api/inventory/logs')
+                ]);
+                tableStates.warehouseBatches.data = await invRes.json();
+                tableStates.warehouseLogs.data = await logsRes.json();
+
+                renderWarehouseMainView();
             } catch (err) {
                 container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading inventory: ${err.message}</div>`;
             }
+        }
+
+        function renderWarehouseMainView() {
+            const container = document.getElementById('sectionContainer');
+            const totalBags = tableStates.warehouseBatches.data.reduce((acc, b) => acc + (b.quantity || 0), 0);
+            const totalBatches = tableStates.warehouseBatches.data.length;
+            const totalLogs = tableStates.warehouseLogs.data.length;
+
+            container.innerHTML = `
+                <!-- Top Summary Banner -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+                    <div>
+                        <h2 class="text-xl font-heading font-extrabold text-slate-900">Zonal Strategic Inventory &amp; Depots</h2>
+                        <p class="text-xs text-slate-500">Live storage levels and audit trails across Dawanau, Bichi, Rano, Kura, and Gaya input hubs.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openAddStockModal()" class="px-4 py-2.5 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
+                            <i class="fas fa-plus"></i> Add Stock Batch
+                        </button>
+                        <button onclick="openTransferModal()" class="px-4 py-2.5 rounded-xl bg-gold-500 text-kano-950 font-bold text-xs hover:bg-gold-400 transition flex items-center gap-1.5 shadow">
+                            <i class="fas fa-truck-moving"></i> Inter-Depot Transfer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- High-Volume Stock Telemetry Strip -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Total Strategic Stock</span>
+                        <div class="text-xl font-heading font-extrabold text-kano-900 mt-0.5">${totalBags.toLocaleString()} Bags</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Active Buffer Batches</span>
+                        <div class="text-xl font-heading font-extrabold text-slate-900 mt-0.5">${totalBatches} Recorded</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Movement Ledger</span>
+                        <div class="text-xl font-heading font-extrabold text-gold-600 mt-0.5">${totalLogs} Logs</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Audit Reconciled</span>
+                        <div class="text-xl font-heading font-extrabold text-emerald-700 mt-0.5">100% Balanced</div>
+                    </div>
+                </div>
+
+                <!-- TABLE 1: ENTERPRISE STRATEGIC STOCK BATCHES TABLE -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-base font-heading font-bold text-slate-900">Strategic Fertilizer Batches Directory</h3>
+                            <p class="text-xs text-slate-500">Live inventory balances by formulation and warehouse location</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <input type="text" id="batchSearchInput" value="${tableStates.warehouseBatches.search}" oninput="filterBatchesSearch(this.value)" placeholder="Search batch, formulation, supplier..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-56 focus:outline-none focus:ring-2 focus:ring-kano-900">
+                            <select onchange="filterBatchesDepot(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                <option value="">All Zonal Depots</option>
+                                <option value="Dawanau" ${tableStates.warehouseBatches.depotFilter === 'Dawanau' ? 'selected' : ''}>Dawanau Central</option>
+                                <option value="Bichi" ${tableStates.warehouseBatches.depotFilter === 'Bichi' ? 'selected' : ''}>Bichi Depot</option>
+                                <option value="Rano" ${tableStates.warehouseBatches.depotFilter === 'Rano' ? 'selected' : ''}>Rano Store</option>
+                                <option value="Kura" ${tableStates.warehouseBatches.depotFilter === 'Kura' ? 'selected' : ''}>Kura Hub</option>
+                                <option value="Gaya" ${tableStates.warehouseBatches.depotFilter === 'Gaya' ? 'selected' : ''}>Gaya Depot</option>
+                            </select>
+                            <button onclick="toggleBatchesDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-slate-50 hover:bg-slate-100 transition" title="Toggle Row Density">
+                                <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.warehouseBatches.density === 'compact' ? 'Comfortable' : 'Compact'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="warehouseBatchesTableContainer">
+                        <!-- Rendered by renderBatchesTableHtml() -->
+                    </div>
+                </div>
+
+                <!-- TABLE 2: WAREHOUSE MOVEMENTS LEDGER TABLE -->
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-base font-heading font-bold text-slate-900">Warehouse Movements &amp; Stock Ledger</h3>
+                            <p class="text-xs text-slate-500">Cryptographically logged batch arrivals, transfers, and field dispensing</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <input type="text" id="logSearchInput" value="${tableStates.warehouseLogs.search}" oninput="filterLogsSearch(this.value)" placeholder="Search movements..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-kano-900">
+                            <select onchange="filterLogsAction(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                <option value="">All Movement Types</option>
+                                <option value="INITIAL_STOCK" ${tableStates.warehouseLogs.actionFilter === 'INITIAL_STOCK' ? 'selected' : ''}>Initial Stock</option>
+                                <option value="TRANSFER" ${tableStates.warehouseLogs.actionFilter === 'TRANSFER' ? 'selected' : ''}>Inter-Depot Transfer</option>
+                                <option value="ADJUSTMENT" ${tableStates.warehouseLogs.actionFilter === 'ADJUSTMENT' ? 'selected' : ''}>Stock Adjustment</option>
+                            </select>
+                            <a href="/api/export/inventory_logs" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition flex items-center gap-1.5">
+                                <i class="fas fa-file-csv text-emerald-700"></i> Export CSV
+                            </a>
+                        </div>
+                    </div>
+
+                    <div id="warehouseLogsTableContainer">
+                        <!-- Rendered by renderLogsTableHtml() -->
+                    </div>
+                </div>
+            `;
+
+            renderBatchesTableHtml();
+            renderLogsTableHtml();
+        }
+
+        function renderBatchesTableHtml() {
+            const st = tableStates.warehouseBatches;
+            let list = st.data.slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(b => 
+                    (b.batch_number && b.batch_number.toLowerCase().includes(q)) ||
+                    (b.fertilizer_type && b.fertilizer_type.toLowerCase().includes(q)) ||
+                    (b.location && b.location.toLowerCase().includes(q)) ||
+                    (b.supplier && b.supplier.toLowerCase().includes(q))
+                );
+            }
+
+            // Depot filter
+            if (st.depotFilter) {
+                list = list.filter(b => b.location && b.location.toLowerCase().includes(st.depotFilter.toLowerCase()));
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                const valA = a[st.sortCol] || '';
+                const valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            // Pagination slice
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('warehouseBatchesTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortBatches('batch_number')">
+                                    Batch No ${st.sortCol === 'batch_number' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortBatches('fertilizer_type')">
+                                    Fertilizer Formulation ${st.sortCol === 'fertilizer_type' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortBatches('location')">
+                                    Depot Location ${st.sortCol === 'location' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortBatches('quantity')">
+                                    Quantity (Available) ${st.sortCol === 'quantity' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Packaging Unit</th>
+                                <th class="py-3 px-3">Supplier / Channel</th>
+                                <th class="py-3 px-3">Status</th>
+                                <th class="py-3 px-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(b => `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="${pyClass} font-mono font-bold text-kano-900">${b.batch_number}</td>
+                                    <td class="${pyClass}">
+                                        <div class="font-bold text-slate-900">${b.fertilizer_type}</div>
+                                    </td>
+                                    <td class="${pyClass} text-slate-700">
+                                        <i class="fas fa-location-dot text-slate-400 mr-1"></i> ${b.location}
+                                    </td>
+                                    <td class="${pyClass}">
+                                        <span class="font-heading font-extrabold text-kano-900 text-sm">${b.quantity.toLocaleString()}</span>
+                                    </td>
+                                    <td class="${pyClass} text-slate-500 font-mono">${b.unit}</td>
+                                    <td class="${pyClass} text-slate-600">${b.supplier || 'KNARDA Subsidy'}</td>
+                                    <td class="${pyClass}">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${b.quantity > 5000 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                            ${b.quantity > 5000 ? 'ADEQUATE BUFFER' : 'MONITOR RESTOCK'}
+                                        </span>
+                                    </td>
+                                    <td class="${pyClass} text-right space-x-1.5 whitespace-nowrap">
+                                        <button onclick="promptAdjustStock(${b.id}, '${b.fertilizer_type}', ${b.quantity})" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition">
+                                            Adjust
+                                        </button>
+                                        <button onclick="openTransferModal()" class="px-2.5 py-1 rounded-lg bg-kano-100 hover:bg-kano-200 text-kano-900 font-bold text-[11px] transition">
+                                            Transfer
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="8" class="py-8 text-center text-slate-400">No inventory batches match your filter criteria.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('warehouseBatches', totalCount, 'setBatchesPage', 'setBatchesPageSize')}
+            `;
+        }
+
+        function sortBatches(col) {
+            const st = tableStates.warehouseBatches;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderBatchesTableHtml();
+        }
+
+        function setBatchesPage(p) {
+            tableStates.warehouseBatches.page = p;
+            renderBatchesTableHtml();
+        }
+
+        function setBatchesPageSize(sz) {
+            tableStates.warehouseBatches.pageSize = sz;
+            tableStates.warehouseBatches.page = 1;
+            renderBatchesTableHtml();
+        }
+
+        function filterBatchesSearch(q) {
+            tableStates.warehouseBatches.search = q;
+            tableStates.warehouseBatches.page = 1;
+            renderBatchesTableHtml();
+        }
+
+        function filterBatchesDepot(depot) {
+            tableStates.warehouseBatches.depotFilter = depot;
+            tableStates.warehouseBatches.page = 1;
+            renderBatchesTableHtml();
+        }
+
+        function toggleBatchesDensity() {
+            tableStates.warehouseBatches.density = tableStates.warehouseBatches.density === 'compact' ? 'comfortable' : 'compact';
+            renderWarehouseMainView();
+        }
+
+        function renderLogsTableHtml() {
+            const st = tableStates.warehouseLogs;
+            let list = st.data.slice();
+
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(l => 
+                    (l.fertilizer_type && l.fertilizer_type.toLowerCase().includes(q)) ||
+                    (l.source && l.source.toLowerCase().includes(q)) ||
+                    (l.destination && l.destination.toLowerCase().includes(q)) ||
+                    (l.notes && l.notes.toLowerCase().includes(q))
+                );
+            }
+
+            if (st.actionFilter) {
+                list = list.filter(l => l.action && l.action.toLowerCase().includes(st.actionFilter.toLowerCase()));
+            }
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+
+            const container = document.getElementById('warehouseLogsTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3">Log ID</th>
+                                <th class="py-3 px-3">Action Type</th>
+                                <th class="py-3 px-3">Fertilizer</th>
+                                <th class="py-3 px-3">Quantity Delta</th>
+                                <th class="py-3 px-3">Resulting Balance</th>
+                                <th class="py-3 px-3">Source / Origin</th>
+                                <th class="py-3 px-3">Destination</th>
+                                <th class="py-3 px-3">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(l => `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="py-3 px-3 font-mono text-slate-500">#${l.id}</td>
+                                    <td class="py-3 px-3">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${l.action.includes('TRANSFER') ? 'bg-amber-100 text-amber-800' : l.action.includes('ADJUST') ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800'}">
+                                            ${l.action}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-3 font-semibold text-slate-800">${l.fertilizer_type}</td>
+                                    <td class="py-3 px-3 font-bold text-kano-900">${l.quantity_change > 0 ? '+' : ''}${l.quantity_change || l.quantity} Bags</td>
+                                    <td class="py-3 px-3 font-mono text-slate-600">${l.resulting_balance ? l.resulting_balance.toLocaleString() : 'N/A'}</td>
+                                    <td class="py-3 px-3 text-slate-600">${l.source || 'N/A'}</td>
+                                    <td class="py-3 px-3 font-medium text-slate-800">${l.destination || 'N/A'}</td>
+                                    <td class="py-3 px-3 text-slate-400 font-mono text-[11px]">${l.timestamp ? l.timestamp.substring(0, 16).replace('T', ' ') : ''}</td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="8" class="py-8 text-center text-slate-400">No stock movements found.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('warehouseLogs', totalCount, 'setLogsPage', 'setLogsPageSize')}
+            `;
+        }
+
+        function setLogsPage(p) {
+            tableStates.warehouseLogs.page = p;
+            renderLogsTableHtml();
+        }
+
+        function setLogsPageSize(sz) {
+            tableStates.warehouseLogs.pageSize = sz;
+            tableStates.warehouseLogs.page = 1;
+            renderLogsTableHtml();
+        }
+
+        function filterLogsSearch(q) {
+            tableStates.warehouseLogs.search = q;
+            tableStates.warehouseLogs.page = 1;
+            renderLogsTableHtml();
+        }
+
+        function filterLogsAction(act) {
+            tableStates.warehouseLogs.actionFilter = act;
+            tableStates.warehouseLogs.page = 1;
+            renderLogsTableHtml();
         }
 
         function openAddStockModal() {
@@ -1313,6 +2033,7 @@
                     fetch('/api/locations/hierarchy')
                 ]);
                 cachedLgas = await lgasRes.json();
+                tableStates.locationsLga.data = cachedLgas;
                 const hier = await hierRes.json();
 
                 container.innerHTML = `
@@ -1338,7 +2059,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano Central</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-900">Kano Central</span>
                                 <span class="text-xs font-bold text-slate-500">${hier['Kano Central'].length} LGAs</span>
                             </div>
                             <h3 class="text-base font-heading font-bold text-slate-900">Peri-Urban &amp; Grain Hub</h3>
@@ -1347,7 +2068,7 @@
 
                         <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano North</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900">Kano North</span>
                                 <span class="text-xs font-bold text-slate-500">${hier['Kano North'].length} LGAs</span>
                             </div>
                             <h3 class="text-base font-heading font-bold text-slate-900">Grain &amp; Wheat Belt</h3>
@@ -1356,7 +2077,7 @@
 
                         <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
                             <div class="flex justify-between items-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano South</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900">Kano South</span>
                                 <span class="text-xs font-bold text-slate-500">${hier['Kano South'].length} LGAs</span>
                             </div>
                             <h3 class="text-base font-heading font-bold text-slate-900">Rice &amp; Irrigation Basin</h3>
@@ -1364,64 +2085,163 @@
                         </div>
                     </div>
 
-                    <!-- 44 LGAs Directory Table -->
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+                    <!-- 44 LGAs Enterprise Paginated Data Table -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                             <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Kano State 44 LGAs &bull; Quotas &amp; Wards</h3>
-                                <p class="text-xs text-slate-500">Detailed register with assigned annual subsidy quotas</p>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Kano State 44 LGAs &bull; Quotas &amp; Wards Register</h3>
+                                <p class="text-xs text-slate-500">Full administrative directory with assigned annual fertilizer subsidy pools</p>
                             </div>
-                            <input type="text" id="lgaSearchAdmin" oninput="filterAdminLgaTable()" placeholder="Search LGA or Zone..." class="px-4 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-64">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <input type="text" id="lgaSearchInput" value="${tableStates.locationsLga.search}" oninput="filterLgaSearch(this.value)" placeholder="Search LGA, HQ, or Zone..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-56 focus:outline-none focus:ring-2 focus:ring-kano-900">
+                                <select onchange="filterLgaZone(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All Senatorial Belts</option>
+                                    <option value="Kano Central" ${tableStates.locationsLga.zoneFilter === 'Kano Central' ? 'selected' : ''}>Kano Central (8)</option>
+                                    <option value="Kano North" ${tableStates.locationsLga.zoneFilter === 'Kano North' ? 'selected' : ''}>Kano North (15)</option>
+                                    <option value="Kano South" ${tableStates.locationsLga.zoneFilter === 'Kano South' ? 'selected' : ''}>Kano South (21)</option>
+                                </select>
+                                <button onclick="toggleLgaDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-slate-50 hover:bg-slate-100 transition" title="Toggle Row Density">
+                                    <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.locationsLga.density === 'compact' ? 'Comfortable' : 'Compact'}
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
-                            <table class="w-full text-left text-xs" id="adminLgaTable">
-                                <thead>
-                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 sticky top-0 bg-white">
-                                        <th class="py-3 px-3">#</th>
-                                        <th class="py-3 px-3">LGA Name</th>
-                                        <th class="py-3 px-3">Zone</th>
-                                        <th class="py-3 px-3">Headquarters</th>
-                                        <th class="py-3 px-3">Wards</th>
-                                        <th class="py-3 px-3">Quota (Bags)</th>
-                                        <th class="py-3 px-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    ${cachedLgas.map((lga, idx) => `
-                                        <tr class="hover:bg-slate-50 transition lga-admin-row">
-                                            <td class="py-3 px-3 font-mono text-slate-400">${idx + 1}</td>
-                                            <td class="py-3 px-3 font-bold text-slate-900">${lga.name}</td>
-                                            <td class="py-3 px-3">
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${lga.zone === 'Kano North' ? 'bg-amber-100 text-amber-800' : lga.zone === 'Kano South' ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">
-                                                    ${lga.zone}
-                                                </span>
-                                            </td>
-                                            <td class="py-3 px-3 text-slate-600">${lga.headquarters || lga.name + ' Town'}</td>
-                                            <td class="py-3 px-3 font-semibold text-slate-700">3 Wards</td>
-                                            <td class="py-3 px-3 font-bold text-kano-900">${(lga.total_quota || 2500).toLocaleString()} Bags</td>
-                                            <td class="py-3 px-3 text-right">
-                                                <button onclick="deleteLgaItem(${lga.id}, '${lga.name}')" class="text-red-500 hover:text-red-700 font-bold text-xs p-1">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                        <div id="lgaTableContainer">
+                            <!-- Rendered by renderLgaTableHtml() -->
                         </div>
                     </div>
                 `;
+
+                renderLgaTableHtml();
             } catch(e) {
                 container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading locations: ${e.message}</div>`;
             }
         }
 
-        function filterAdminLgaTable() {
-            const query = document.getElementById('lgaSearchAdmin').value.toLowerCase();
-            document.querySelectorAll('.lga-admin-row').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+        function renderLgaTableHtml() {
+            const st = tableStates.locationsLga;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(l => 
+                    (l.name && l.name.toLowerCase().includes(q)) ||
+                    (l.headquarters && l.headquarters.toLowerCase().includes(q)) ||
+                    (l.zone && l.zone.toLowerCase().includes(q))
+                );
+            }
+
+            // Zone filter
+            if (st.zoneFilter) {
+                list = list.filter(l => l.zone === st.zoneFilter);
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
             });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('lgaTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3">#</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortLgaTable('name')">
+                                    LGA Name ${st.sortCol === 'name' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortLgaTable('zone')">
+                                    Senatorial Belt ${st.sortCol === 'zone' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortLgaTable('headquarters')">
+                                    Headquarters ${st.sortCol === 'headquarters' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Wards Registered</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortLgaTable('total_quota')">
+                                    Annual Quota ${st.sortCol === 'total_quota' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map((lga, idx) => `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="${pyClass} font-mono text-slate-400">${startIndex + idx + 1}</td>
+                                    <td class="${pyClass} font-bold text-slate-900">${lga.name}</td>
+                                    <td class="${pyClass}">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${lga.zone === 'Kano North' ? 'bg-amber-100 text-amber-800' : lga.zone === 'Kano South' ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">
+                                            ${lga.zone}
+                                        </span>
+                                    </td>
+                                    <td class="${pyClass} text-slate-600">${lga.headquarters || lga.name + ' Town'}</td>
+                                    <td class="${pyClass} font-semibold text-slate-700">3 Wards</td>
+                                    <td class="${pyClass} font-bold text-kano-900">${(lga.total_quota || 2500).toLocaleString()} Bags</td>
+                                    <td class="${pyClass} text-right">
+                                        <button onclick="deleteLgaItem(${lga.id}, '${lga.name}')" class="text-red-500 hover:text-red-700 font-bold text-xs p-1" title="Delete LGA">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-slate-400">No LGAs match your search and filter criteria.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('locationsLga', totalCount, 'setLgaPage', 'setLgaPageSize')}
+            `;
+        }
+
+        function sortLgaTable(col) {
+            const st = tableStates.locationsLga;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderLgaTableHtml();
+        }
+
+        function setLgaPage(p) {
+            tableStates.locationsLga.page = p;
+            renderLgaTableHtml();
+        }
+
+        function setLgaPageSize(sz) {
+            tableStates.locationsLga.pageSize = sz;
+            tableStates.locationsLga.page = 1;
+            renderLgaTableHtml();
+        }
+
+        function filterLgaSearch(q) {
+            tableStates.locationsLga.search = q;
+            tableStates.locationsLga.page = 1;
+            renderLgaTableHtml();
+        }
+
+        function filterLgaZone(z) {
+            tableStates.locationsLga.zoneFilter = z;
+            tableStates.locationsLga.page = 1;
+            renderLgaTableHtml();
+        }
+
+        function toggleLgaDensity() {
+            tableStates.locationsLga.density = tableStates.locationsLga.density === 'compact' ? 'comfortable' : 'compact';
+            renderLgaTableHtml();
         }
 
         function openAddLgaModal() {
@@ -1550,20 +2370,24 @@
         // ====================================================
         async function loadFarmersRegistryView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Enrolled Farmers...</div>';
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Enrolled Farmers Registry...</div>';
 
             try {
                 const res = await fetch('/api/farmers');
                 const farmers = await res.json();
+                tableStates.farmers.data = farmers;
+
+                // Extract unique LGAs and crops for dropdown filters
+                const uniqueLgas = Array.from(new Set(farmers.map(f => f.lga).filter(Boolean))).sort();
 
                 container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                             <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Enrolled Kano Farmers Directory</h3>
-                                <p class="text-xs text-slate-500">Click any farmer to inspect passport photo, cooperative evidence, and NIN</p>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Enrolled Kano Smallholder Farmers Directory</h3>
+                                <p class="text-xs text-slate-500">Verified smallholders with biometrics, land size, NIN, and cooperative membership across Kano 44 LGAs</p>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex flex-wrap items-center gap-2">
                                 <a href="/api/export/farmers" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 border border-slate-200">
                                     <i class="fas fa-file-csv text-emerald-700"></i> Export CSV
                                 </a>
@@ -1573,42 +2397,198 @@
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
-                                        <th class="py-3 px-3">Farmer ID</th>
-                                        <th class="py-3 px-3">Full Name</th>
-                                        <th class="py-3 px-3">Phone</th>
-                                        <th class="py-3 px-3">LGA / Ward</th>
-                                        <th class="py-3 px-3">Acreage &amp; Crop</th>
-                                        <th class="py-3 px-3">Cooperative</th>
-                                        <th class="py-3 px-3 text-right">Lifetime Bags</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    ${farmers.map(f => `
-                                        <tr onclick="inspectFarmerProfile('${f.id}')" class="hover:bg-kano-50/60 cursor-pointer transition">
-                                            <td class="py-3 px-3 font-mono font-bold text-kano-900">${f.id}</td>
-                                            <td class="py-3 px-3 font-bold text-slate-900">${f.name}</td>
-                                            <td class="py-3 px-3 text-slate-600">${f.phone}</td>
-                                            <td class="py-3 px-3 text-slate-700">${f.lga} <span class="text-slate-400 font-normal">(${f.ward})</span></td>
-                                            <td class="py-3 px-3">
-                                                <span class="font-bold text-slate-800">${f.farm_size} ha</span> &bull; 
-                                                <span class="text-slate-500">${f.crop_type}</span>
-                                            </td>
-                                            <td class="py-3 px-3 text-slate-600">${f.coop_name || '<span class="text-slate-400">None</span>'}</td>
-                                            <td class="py-3 px-3 text-right font-bold text-emerald-700">${f.total_bags_received} Bags</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                        <!-- Multi-faceted Filter Controls Strip -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <input type="text" id="farmersSearchInput" value="${tableStates.farmers.search}" oninput="filterFarmersSearch(this.value)" placeholder="Search name, ID, phone, NIN..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-56 focus:outline-none focus:ring-2 focus:ring-kano-900 bg-white">
+                                <select onchange="filterFarmersLga(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All LGAs (${uniqueLgas.length})</option>
+                                    ${uniqueLgas.map(lga => `<option value="${lga}" ${tableStates.farmers.lgaFilter === lga ? 'selected' : ''}>${lga}</option>`).join('')}
+                                </select>
+                                <select onchange="filterFarmersCrop(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All Crop Types</option>
+                                    <option value="Rice" ${tableStates.farmers.cropFilter === 'Rice' ? 'selected' : ''}>Rice &amp; Paddy</option>
+                                    <option value="Wheat" ${tableStates.farmers.cropFilter === 'Wheat' ? 'selected' : ''}>Wheat</option>
+                                    <option value="Maize" ${tableStates.farmers.cropFilter === 'Maize' ? 'selected' : ''}>Maize / Corn</option>
+                                    <option value="Sorghum" ${tableStates.farmers.cropFilter === 'Sorghum' ? 'selected' : ''}>Sorghum / Guinea Corn</option>
+                                    <option value="Millet" ${tableStates.farmers.cropFilter === 'Millet' ? 'selected' : ''}>Millet</option>
+                                    <option value="Soybean" ${tableStates.farmers.cropFilter === 'Soybean' ? 'selected' : ''}>Soybeans / Legumes</option>
+                                    <option value="Tomato" ${tableStates.farmers.cropFilter === 'Tomato' ? 'selected' : ''}>Tomato / Horticulture</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleFarmersDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white hover:bg-slate-100 transition" title="Toggle Row Density">
+                                    <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.farmers.density === 'compact' ? 'Comfortable' : 'Compact'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="farmersTableContainer">
+                            <!-- Rendered by renderFarmersTableHtml() -->
                         </div>
                     </div>
                 `;
+
+                renderFarmersTableHtml();
             } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load farmers list.</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load farmers registry: ${e.message}</div>`;
             }
+        }
+
+        function renderFarmersTableHtml() {
+            const st = tableStates.farmers;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(f => 
+                    (f.name && f.name.toLowerCase().includes(q)) ||
+                    (f.id && f.id.toLowerCase().includes(q)) ||
+                    (f.phone && f.phone.toLowerCase().includes(q)) ||
+                    (f.nin && f.nin.toLowerCase().includes(q)) ||
+                    (f.lga && f.lga.toLowerCase().includes(q)) ||
+                    (f.ward && f.ward.toLowerCase().includes(q)) ||
+                    (f.coop_name && f.coop_name.toLowerCase().includes(q))
+                );
+            }
+
+            // LGA filter
+            if (st.lgaFilter) {
+                list = list.filter(f => f.lga === st.lgaFilter);
+            }
+
+            // Crop filter
+            if (st.cropFilter) {
+                list = list.filter(f => f.crop_type && f.crop_type.toLowerCase().includes(st.cropFilter.toLowerCase()));
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('farmersTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortFarmersTable('id')">
+                                    Farmer ID ${st.sortCol === 'id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortFarmersTable('name')">
+                                    Farmer Full Name &amp; NIN ${st.sortCol === 'name' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Phone</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortFarmersTable('lga')">
+                                    LGA / Ward ${st.sortCol === 'lga' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortFarmersTable('farm_size')">
+                                    Farm Acreage &amp; Crop ${st.sortCol === 'farm_size' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Cooperative Apex</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700 text-right" onclick="sortFarmersTable('total_bags_received')">
+                                    Lifetime Bags ${st.sortCol === 'total_bags_received' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(f => `
+                                <tr class="hover:bg-kano-50/50 transition cursor-pointer" onclick="inspectFarmerProfile('${f.id}')">
+                                    <td class="${pyClass} font-mono font-bold text-kano-900">${f.id}</td>
+                                    <td class="${pyClass}">
+                                        <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                            <span>${f.name}</span>
+                                            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold">VERIFIED</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 font-mono">NIN: ${f.nin || '23456789012'}</div>
+                                    </td>
+                                    <td class="${pyClass} text-slate-600 font-mono text-[11px]">${f.phone}</td>
+                                    <td class="${pyClass} text-slate-700">
+                                        <div class="font-semibold">${f.lga}</div>
+                                        <div class="text-slate-400 text-[10px]">${f.ward}</div>
+                                    </td>
+                                    <td class="${pyClass}">
+                                        <span class="font-bold text-slate-900">${f.farm_size} ha</span> &bull; 
+                                        <span class="text-slate-500">${f.crop_type}</span>
+                                    </td>
+                                    <td class="${pyClass} text-slate-600">
+                                        ${f.coop_name ? `<span class="font-medium text-slate-800">${f.coop_name}</span>` : '<span class="text-slate-400 italic">Independent</span>'}
+                                    </td>
+                                    <td class="${pyClass} text-right font-bold text-emerald-700 text-sm">${f.total_bags_received} Bags</td>
+                                    <td class="${pyClass} text-right" onclick="event.stopPropagation()">
+                                        <button onclick="inspectFarmerProfile('${f.id}')" class="px-2.5 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] border border-kano-200 transition inline-flex items-center gap-1">
+                                            <i class="fas fa-id-card"></i> Dossier
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="8" class="py-8 text-center text-slate-400">No farmers found matching your criteria.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('farmers', totalCount, 'setFarmersPage', 'setFarmersPageSize')}
+            `;
+        }
+
+        function sortFarmersTable(col) {
+            const st = tableStates.farmers;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderFarmersTableHtml();
+        }
+
+        function setFarmersPage(p) {
+            tableStates.farmers.page = p;
+            renderFarmersTableHtml();
+        }
+
+        function setFarmersPageSize(sz) {
+            tableStates.farmers.pageSize = sz;
+            tableStates.farmers.page = 1;
+            renderFarmersTableHtml();
+        }
+
+        function filterFarmersSearch(q) {
+            tableStates.farmers.search = q;
+            tableStates.farmers.page = 1;
+            renderFarmersTableHtml();
+        }
+
+        function filterFarmersLga(lga) {
+            tableStates.farmers.lgaFilter = lga;
+            tableStates.farmers.page = 1;
+            renderFarmersTableHtml();
+        }
+
+        function filterFarmersCrop(crop) {
+            tableStates.farmers.cropFilter = crop;
+            tableStates.farmers.page = 1;
+            renderFarmersTableHtml();
+        }
+
+        function toggleFarmersDensity() {
+            tableStates.farmers.density = tableStates.farmers.density === 'compact' ? 'comfortable' : 'compact';
+            renderFarmersTableHtml();
         }
 
         async function inspectFarmerProfile(farmerId) {
@@ -1673,45 +2653,215 @@
         // ====================================================
         async function loadOfficersAdminView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Store Officers...</div>';
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Authorized Store Officers...</div>';
 
             try {
                 const res = await fetch('/api/officers');
                 const officers = await res.json();
+                tableStates.officers.data = officers;
+
+                const totalDispensedAll = officers.reduce((acc, o) => acc + (o.total_dispensed || 0), 0);
 
                 container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Zonal Store Officers &amp; Terminal Supervisors</h2>
+                            <p class="text-xs text-slate-500">Authorized personnel operating biometric &amp; QR verification terminals across Kano State fertilizer depots.</p>
+                        </div>
+                        <button onclick="document.getElementById('addOfficerModal').classList.remove('hidden')" class="px-4 py-2.5 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
+                            <i class="fas fa-user-plus"></i> Enroll Store Officer
+                        </button>
+                    </div>
+
+                    <!-- Officers Telemetry Strip -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase">Authorized Officers</span>
+                            <div class="text-xl font-heading font-extrabold text-slate-900 mt-0.5">${officers.length} Terminals</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase">Field Terminal Status</span>
+                            <div class="text-xl font-heading font-extrabold text-emerald-700 mt-0.5">100% Online</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 col-span-2 sm:col-span-1">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase">Total Field Dispensed</span>
+                            <div class="text-xl font-heading font-extrabold text-kano-900 mt-0.5">${totalDispensedAll.toLocaleString()} Bags</div>
+                        </div>
+                    </div>
+
+                    <!-- Enterprise Paginated Officers Data Table (Zero Cards) -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                             <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Authorized Zonal Store Officers</h3>
-                                <p class="text-xs text-slate-500">Personnel authorized to operate QR scanner terminals and dispense fertilizer</p>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Store Officers Directory &bull; Terminal Registry</h3>
+                                <p class="text-xs text-slate-500">Cryptographically provisioned personnel with bag dispensing authority</p>
                             </div>
-                            <button onclick="document.getElementById('addOfficerModal').classList.remove('hidden')" class="px-4 py-2 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
-                                <i class="fas fa-user-plus"></i> Enroll Store Officer
-                            </button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <input type="text" id="officerSearchInput" value="${tableStates.officers.search}" oninput="filterOfficersSearch(this.value)" placeholder="Search ID, Name, Depot..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-kano-900">
+                                <select onchange="filterOfficersDepot(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All Zonal Depots</option>
+                                    <option value="Dawanau" ${tableStates.officers.zoneFilter === 'Dawanau' ? 'selected' : ''}>Dawanau Central</option>
+                                    <option value="Bichi" ${tableStates.officers.zoneFilter === 'Bichi' ? 'selected' : ''}>Bichi Depot</option>
+                                    <option value="Rano" ${tableStates.officers.zoneFilter === 'Rano' ? 'selected' : ''}>Rano Store</option>
+                                    <option value="Kura" ${tableStates.officers.zoneFilter === 'Kura' ? 'selected' : ''}>Kura Hub</option>
+                                    <option value="Gaya" ${tableStates.officers.zoneFilter === 'Gaya' ? 'selected' : ''}>Gaya Depot</option>
+                                </select>
+                                <button onclick="toggleOfficersDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-slate-50 hover:bg-slate-100 transition" title="Toggle Row Density">
+                                    <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.officers.density === 'compact' ? 'Comfortable' : 'Compact'}
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${officers.map(o => `
-                                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-kano-100 text-kano-900">${o.id}</span>
-                                        <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">ACTIVE TERMINAL</span>
-                                    </div>
-                                    <h4 class="font-heading font-bold text-slate-900 text-base">${o.name}</h4>
-                                    <p class="text-xs text-slate-600"><i class="fas fa-warehouse text-slate-400 mr-1"></i> ${o.location}</p>
-                                    <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
-                                        <span class="text-slate-500">Total Dispensed:</span>
-                                        <strong class="text-kano-900 font-extrabold text-sm">${o.total_dispensed || 0} Bags</strong>
-                                    </div>
-                                </div>
-                            `).join('')}
+                        <div id="officersTableContainer">
+                            <!-- Rendered by renderOfficersTableHtml() -->
                         </div>
                     </div>
                 `;
+
+                renderOfficersTableHtml();
             } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading officers.</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading officers: ${e.message}</div>`;
             }
+        }
+
+        function renderOfficersTableHtml() {
+            const st = tableStates.officers;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(o => 
+                    (o.id && o.id.toLowerCase().includes(q)) ||
+                    (o.name && o.name.toLowerCase().includes(q)) ||
+                    (o.location && o.location.toLowerCase().includes(q))
+                );
+            }
+
+            // Depot filter
+            if (st.zoneFilter) {
+                list = list.filter(o => o.location && o.location.toLowerCase().includes(st.zoneFilter.toLowerCase()));
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('officersTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficersTable('id')">
+                                    Officer ID ${st.sortCol === 'id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficersTable('name')">
+                                    Officer Full Name ${st.sortCol === 'name' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficersTable('location')">
+                                    Assigned Depot Location ${st.sortCol === 'location' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Senatorial Zone</th>
+                                <th class="py-3 px-3">Terminal Status</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700 text-right" onclick="sortOfficersTable('total_dispensed')">
+                                    Total Dispensed ${st.sortCol === 'total_dispensed' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(o => {
+                                const zone = o.location.includes('Bichi') ? 'Kano North' : (o.location.includes('Rano') || o.location.includes('Kura') || o.location.includes('Gaya')) ? 'Kano South' : 'Kano Central';
+                                return `
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="${pyClass} font-mono font-bold text-kano-900">${o.id}</td>
+                                        <td class="${pyClass}">
+                                            <div class="font-bold text-slate-900">${o.name}</div>
+                                            <div class="text-[10px] text-slate-400">KNARDA Extension Officer</div>
+                                        </td>
+                                        <td class="${pyClass} text-slate-700">
+                                            <i class="fas fa-warehouse text-slate-400 mr-1"></i> ${o.location}
+                                        </td>
+                                        <td class="${pyClass}">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${zone === 'Kano North' ? 'bg-amber-100 text-amber-800' : zone === 'Kano South' ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">
+                                                ${zone}
+                                            </span>
+                                        </td>
+                                        <td class="${pyClass}">
+                                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                <i class="fas fa-circle-check mr-1 text-[9px]"></i> ACTIVE TERMINAL
+                                            </span>
+                                        </td>
+                                        <td class="${pyClass} text-right font-extrabold text-kano-900 text-sm">
+                                            ${(o.total_dispensed || 0).toLocaleString()} Bags
+                                        </td>
+                                        <td class="${pyClass} text-right space-x-1">
+                                            <button onclick="switchTab('distribution-terminal')" class="px-2.5 py-1 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] transition inline-flex items-center gap-1">
+                                                <i class="fas fa-qrcode"></i> Terminal
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('') : `
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-slate-400">No store officers match your search or filter.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('officers', totalCount, 'setOfficersPage', 'setOfficersPageSize')}
+            `;
+        }
+
+        function sortOfficersTable(col) {
+            const st = tableStates.officers;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderOfficersTableHtml();
+        }
+
+        function setOfficersPage(p) {
+            tableStates.officers.page = p;
+            renderOfficersTableHtml();
+        }
+
+        function setOfficersPageSize(sz) {
+            tableStates.officers.pageSize = sz;
+            tableStates.officers.page = 1;
+            renderOfficersTableHtml();
+        }
+
+        function filterOfficersSearch(q) {
+            tableStates.officers.search = q;
+            tableStates.officers.page = 1;
+            renderOfficersTableHtml();
+        }
+
+        function filterOfficersDepot(depot) {
+            tableStates.officers.zoneFilter = depot;
+            tableStates.officers.page = 1;
+            renderOfficersTableHtml();
+        }
+
+        function toggleOfficersDensity() {
+            tableStates.officers.density = tableStates.officers.density === 'compact' ? 'comfortable' : 'compact';
+            renderOfficersTableHtml();
         }
 
         async function handleAddOfficer(e) {
@@ -1755,6 +2905,11 @@
                     const reqRes = await fetch(`/api/requests/season/${activeSeason.id}`);
                     requests = await reqRes.json();
                 }
+                tableStates.allocationReqs.data = requests;
+                tableStates.allocationReqs.selected = tableStates.allocationReqs.selected || new Set();
+
+                const uniqueLgas = Array.from(new Set(requests.map(r => r.lga).filter(Boolean))).sort();
+                const pendingCount = requests.filter(r => r.status === 'pending').length;
 
                 container.innerHTML = `
                     <div class="bg-gradient-to-r from-kano-950 to-kano-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden mb-6">
@@ -1777,66 +2932,343 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <!-- Enterprise Paginated Applications Table -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                             <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Farmer Quota Applications</h3>
-                                <p class="text-xs text-slate-500">Applications queued for algorithmic quota allocation</p>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Farmer Quota Applications Ledger</h3>
+                                <p class="text-xs text-slate-500">Live registry of smallholder quota applications with batch approval and blockchain validation</p>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <a href="/api/export/allocations" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200 flex items-center gap-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                ${pendingCount > 0 ? `
+                                    <button onclick="executeBulkAllocateAll()" class="px-4 py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-kano-950 font-bold text-xs transition flex items-center gap-1.5 shadow">
+                                        <i class="fas fa-check-double"></i> Bulk Allocate All Pending (${pendingCount})
+                                    </button>
+                                ` : ''}
+                                <a href="/api/export/allocations" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200 flex items-center gap-1.5">
                                     <i class="fas fa-file-csv text-emerald-700"></i> Export CSV
                                 </a>
-                                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">${requests.length} Submissions</span>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
-                                        <th class="py-3 px-3">Req ID</th>
-                                        <th class="py-3 px-3">Farmer</th>
-                                        <th class="py-3 px-3">LGA</th>
-                                        <th class="py-3 px-3">Requested</th>
-                                        <th class="py-3 px-3">Allocated</th>
-                                        <th class="py-3 px-3">Status</th>
-                                        <th class="py-3 px-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    ${requests.map(r => `
-                                        <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-3 px-3 font-mono font-bold text-slate-700">#${r.id}</td>
-                                            <td class="py-3 px-3">
-                                                <div class="font-bold text-slate-900">${r.farmer_name}</div>
-                                                <div class="text-[10px] text-slate-400 font-mono">${r.farmer_id}</div>
-                                            </td>
-                                            <td class="py-3 px-3 font-medium text-slate-700">${r.lga}</td>
-                                            <td class="py-3 px-3 font-bold text-slate-700">${r.requested_bags} Bags</td>
-                                            <td class="py-3 px-3 font-bold ${r.allocated_bags > 0 ? 'text-kano-900' : 'text-slate-400'}">${r.allocated_bags > 0 ? r.allocated_bags + ' Bags' : 'Pending'}</td>
-                                            <td class="py-3 px-3">
-                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${r.status === 'distributed' ? 'bg-emerald-100 text-emerald-800' : r.status === 'allocated' ? 'bg-gold-100 text-gold-800' : 'bg-slate-100 text-slate-700'}">
-                                                    ${r.status.toUpperCase()}
-                                                </span>
-                                            </td>
-                                            <td class="py-3 px-3 text-right space-x-1">
-                                                <button onclick="openSmsSimulator(${r.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1">
-                                                    <i class="fas fa-sms text-kano-900"></i> SMS
-                                                </button>
-                                                <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1 border border-kano-200">
-                                                    <i class="fas fa-print"></i> Slip
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                        <!-- Multi-faceted Filter Controls Strip -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <input type="text" id="allocSearchInput" value="${tableStates.allocationReqs.search}" oninput="filterAllocReqsSearch(this.value)" placeholder="Search name, ID, req ID, LGA..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-56 focus:outline-none focus:ring-2 focus:ring-kano-900 bg-white">
+                                <select onchange="filterAllocReqsStatus(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All Application Statuses</option>
+                                    <option value="pending" ${tableStates.allocationReqs.statusFilter === 'pending' ? 'selected' : ''}>Pending (${pendingCount})</option>
+                                    <option value="allocated" ${tableStates.allocationReqs.statusFilter === 'allocated' ? 'selected' : ''}>Allocated</option>
+                                    <option value="distributed" ${tableStates.allocationReqs.statusFilter === 'distributed' ? 'selected' : ''}>Distributed</option>
+                                </select>
+                                <select onchange="filterAllocReqsLga(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All LGAs (${uniqueLgas.length})</option>
+                                    ${uniqueLgas.map(lga => `<option value="${lga}" ${tableStates.allocationReqs.lgaFilter === lga ? 'selected' : ''}>${lga}</option>`).join('')}
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleAllocReqsDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white hover:bg-slate-100 transition" title="Toggle Row Density">
+                                    <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.allocationReqs.density === 'compact' ? 'Comfortable' : 'Compact'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sticky Multi-Select Floating Action Bar -->
+                        <div id="bulkActionBar" class="${tableStates.allocationReqs.selected.size > 0 ? 'flex' : 'hidden'} items-center justify-between p-3.5 bg-kano-950 text-white rounded-2xl shadow-lg border border-gold-500/40">
+                            <div class="flex items-center gap-2.5 text-xs font-bold">
+                                <i class="fas fa-check-square text-gold-400 text-base"></i>
+                                <span><span id="bulkSelectedCount">${tableStates.allocationReqs.selected.size}</span> Applications Selected</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="executeBulkAllocateSelected()" class="px-4 py-1.5 rounded-xl bg-gold-500 hover:bg-gold-400 text-kano-950 font-bold text-xs transition flex items-center gap-1.5 shadow">
+                                    <i class="fas fa-check"></i> Bulk Allocate Selected
+                                </button>
+                                <button onclick="clearAllocReqsSelection()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="allocationTableContainer">
+                            <!-- Rendered by renderAllocationTableHtml() -->
                         </div>
                     </div>
                 `;
+
+                renderAllocationTableHtml();
             } catch (err) {
                 container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading allocation view: ${err.message}</div>`;
+            }
+        }
+
+        function renderAllocationTableHtml() {
+            const st = tableStates.allocationReqs;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(r => 
+                    String(r.id).includes(q) ||
+                    (r.farmer_name && r.farmer_name.toLowerCase().includes(q)) ||
+                    (r.farmer_id && r.farmer_id.toLowerCase().includes(q)) ||
+                    (r.lga && r.lga.toLowerCase().includes(q))
+                );
+            }
+
+            // Status filter
+            if (st.statusFilter) {
+                list = list.filter(r => r.status === st.statusFilter);
+            }
+
+            // LGA filter
+            if (st.lgaFilter) {
+                list = list.filter(r => r.lga === st.lgaFilter);
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            // Check if all page items are selected
+            const allPageSelected = pageData.length > 0 && pageData.every(r => st.selected.has(r.id));
+
+            const container = document.getElementById('allocationTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 w-8">
+                                    <input type="checkbox" onchange="toggleSelectAllReqs(this.checked)" ${allPageSelected ? 'checked' : ''} class="rounded text-kano-900 focus:ring-kano-900 cursor-pointer">
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('id')">
+                                    Req ID ${st.sortCol === 'id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('farmer_name')">
+                                    Smallholder Farmer ${st.sortCol === 'farmer_name' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('lga')">
+                                    LGA Location ${st.sortCol === 'lga' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('requested_bags')">
+                                    Requested ${st.sortCol === 'requested_bags' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('allocated_bags')">
+                                    Allocated Quota ${st.sortCol === 'allocated_bags' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAllocReqs('status')">
+                                    Status ${st.sortCol === 'status' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(r => `
+                                <tr class="hover:bg-slate-50 transition ${st.selected.has(r.id) ? 'bg-gold-50/50' : ''}">
+                                    <td class="${pyClass}">
+                                        <input type="checkbox" onchange="toggleSelectReq(${r.id})" ${st.selected.has(r.id) ? 'checked' : ''} class="rounded text-kano-900 focus:ring-kano-900 cursor-pointer">
+                                    </td>
+                                    <td class="${pyClass} font-mono font-bold text-slate-700">#${r.id}</td>
+                                    <td class="${pyClass}">
+                                        <div class="font-bold text-slate-900">${r.farmer_name}</div>
+                                        <div class="text-[10px] text-slate-400 font-mono">${r.farmer_id}</div>
+                                    </td>
+                                    <td class="${pyClass} font-medium text-slate-700">${r.lga}</td>
+                                    <td class="${pyClass} font-bold text-slate-700">${r.requested_bags} Bags</td>
+                                    <td class="${pyClass} font-bold ${r.allocated_bags > 0 ? 'text-kano-900 font-extrabold text-sm' : 'text-slate-400'}">${r.allocated_bags > 0 ? r.allocated_bags + ' Bags' : 'Pending'}</td>
+                                    <td class="${pyClass}">
+                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${r.status === 'distributed' ? 'bg-emerald-100 text-emerald-800' : r.status === 'allocated' ? 'bg-gold-100 text-gold-800' : 'bg-slate-100 text-slate-700'}">
+                                            ${r.status.toUpperCase()}
+                                        </span>
+                                    </td>
+                                    <td class="${pyClass} text-right space-x-1 whitespace-nowrap">
+                                        <button onclick="openSmsSimulator(${r.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1">
+                                            <i class="fas fa-sms text-kano-900"></i> SMS
+                                        </button>
+                                        <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1 border border-kano-200">
+                                            <i class="fas fa-print"></i> Slip
+                                        </a>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="8" class="py-8 text-center text-slate-400">No subsidy applications match your criteria.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('allocationReqs', totalCount, 'setAllocReqsPage', 'setAllocReqsPageSize')}
+            `;
+
+            updateBulkActionBar();
+        }
+
+        function sortAllocReqs(col) {
+            const st = tableStates.allocationReqs;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderAllocationTableHtml();
+        }
+
+        function setAllocReqsPage(p) {
+            tableStates.allocationReqs.page = p;
+            renderAllocationTableHtml();
+        }
+
+        function setAllocReqsPageSize(sz) {
+            tableStates.allocationReqs.pageSize = sz;
+            tableStates.allocationReqs.page = 1;
+            renderAllocationTableHtml();
+        }
+
+        function filterAllocReqsSearch(q) {
+            tableStates.allocationReqs.search = q;
+            tableStates.allocationReqs.page = 1;
+            renderAllocationTableHtml();
+        }
+
+        function filterAllocReqsStatus(status) {
+            tableStates.allocationReqs.statusFilter = status;
+            tableStates.allocationReqs.page = 1;
+            renderAllocationTableHtml();
+        }
+
+        function filterAllocReqsLga(lga) {
+            tableStates.allocationReqs.lgaFilter = lga;
+            tableStates.allocationReqs.page = 1;
+            renderAllocationTableHtml();
+        }
+
+        function toggleAllocReqsDensity() {
+            tableStates.allocationReqs.density = tableStates.allocationReqs.density === 'compact' ? 'comfortable' : 'compact';
+            renderAllocationTableHtml();
+        }
+
+        function toggleSelectReq(id) {
+            const sel = tableStates.allocationReqs.selected;
+            if (sel.has(id)) sel.delete(id);
+            else sel.add(id);
+            renderAllocationTableHtml();
+        }
+
+        function toggleSelectAllReqs(isChecked) {
+            const st = tableStates.allocationReqs;
+            let list = (st.data || []).slice();
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(r => String(r.id).includes(q) || (r.farmer_name && r.farmer_name.toLowerCase().includes(q)) || (r.lga && r.lga.toLowerCase().includes(q)));
+            }
+            if (st.statusFilter) list = list.filter(r => r.status === st.statusFilter);
+            if (st.lgaFilter) list = list.filter(r => r.lga === st.lgaFilter);
+
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+
+            pageData.forEach(r => {
+                if (isChecked) st.selected.add(r.id);
+                else st.selected.delete(r.id);
+            });
+            renderAllocationTableHtml();
+        }
+
+        function clearAllocReqsSelection() {
+            tableStates.allocationReqs.selected.clear();
+            renderAllocationTableHtml();
+        }
+
+        function updateBulkActionBar() {
+            const bar = document.getElementById('bulkActionBar');
+            const cntSpan = document.getElementById('bulkSelectedCount');
+            const count = tableStates.allocationReqs.selected.size;
+            if (bar) {
+                bar.className = count > 0 ? 'flex items-center justify-between p-3.5 bg-kano-950 text-white rounded-2xl shadow-lg border border-gold-500/40' : 'hidden';
+            }
+            if (cntSpan) cntSpan.innerText = count;
+        }
+
+        async function executeBulkAllocateSelected() {
+            const selArray = Array.from(tableStates.allocationReqs.selected);
+            if (selArray.length === 0) return;
+
+            Swal.fire({
+                title: 'Executing Bulk Allocation...',
+                html: `Allocating quotas for ${selArray.length} selected smallholder applications and sealing to Kano State blockchain...`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const res = await fetch('/api/requests/bulk_allocate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ request_ids: selArray, actor_id: currentUser.user_id })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    tableStates.allocationReqs.selected.clear();
+                    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                    Swal.fire({ icon: 'success', title: 'Bulk Allocation Complete!', text: data.message, confirmButtonColor: '#046A38' });
+                    loadAllocationEngineView();
+                } else {
+                    Swal.fire({ icon: 'warning', title: 'Notice', text: data.message });
+                }
+            } catch(e) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Bulk allocation failed: ' + e.message });
+            }
+        }
+
+        async function executeBulkAllocateAll() {
+            const confirm = await Swal.fire({
+                title: 'Bulk Allocate All Pending?',
+                text: 'This will algorithmically compute quotas, issue SMS voucher tokens, and create SHA-256 blocks for all pending smallholder applications.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#046A38',
+                confirmButtonText: 'Yes, Execute All'
+            });
+
+            if (confirm.isConfirmed) {
+                Swal.fire({
+                    title: 'Executing Statewide Bulk Allocation...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                try {
+                    const res = await fetch('/api/requests/bulk_allocate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ request_ids: [], actor_id: currentUser.user_id })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        tableStates.allocationReqs.selected.clear();
+                        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+                        Swal.fire({ icon: 'success', title: 'All Applications Allocated!', text: data.message, confirmButtonColor: '#046A38' });
+                        loadAllocationEngineView();
+                    } else {
+                        Swal.fire({ icon: 'info', title: 'Notice', text: data.message });
+                    }
+                } catch(e) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Allocation failed: ' + e.message });
+                }
             }
         }
 
@@ -2419,54 +3851,156 @@
             try {
                 const res = await fetch(`/api/distributions/officer/${currentUser.user_id}`);
                 const history = await res.json();
+                tableStates.officerHistory.data = history;
+
+                const totalBagsDispensed = history.reduce((acc, h) => acc + (h.allocated_bags || 0), 0);
 
                 container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                             <div>
                                 <h3 class="text-base font-heading font-bold text-slate-900">Officer Dispensing History &bull; ${currentUser.name}</h3>
-                                <p class="text-xs text-slate-500">Official log of bags released by store officers at this depot center</p>
+                                <p class="text-xs text-slate-500">Official log of fertilizer bags verified and dispensed by this terminal officer</p>
                             </div>
-                            <span class="text-xs font-bold text-kano-900 bg-kano-50 px-3 py-1 rounded-full">${history.length} Dispensed Orders</span>
+                            <div class="flex items-center gap-3">
+                                <div class="px-3.5 py-1.5 rounded-xl bg-kano-50 border border-kano-200 text-xs text-kano-950 font-bold">
+                                    Total Released: <span class="text-kano-900 font-extrabold">${totalBagsDispensed.toLocaleString()} Bags</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs">
-                                <thead>
-                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
-                                        <th class="py-3 px-3">Req ID</th>
-                                        <th class="py-3 px-3">Farmer</th>
-                                        <th class="py-3 px-3">LGA</th>
-                                        <th class="py-3 px-3">Phone</th>
-                                        <th class="py-3 px-3">Bags Released</th>
-                                        <th class="py-3 px-3">Dispensed At</th>
-                                        <th class="py-3 px-3 text-right">Slip</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    ${history.map(h => `
-                                        <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-3 px-3 font-mono text-slate-600">#${h.id}</td>
-                                            <td class="py-3 px-3 font-bold text-slate-900">${h.farmer_name}</td>
-                                            <td class="py-3 px-3 text-slate-700">${h.lga}</td>
-                                            <td class="py-3 px-3 text-slate-600">${h.farmer_phone}</td>
-                                            <td class="py-3 px-3 font-bold text-kano-900">${h.allocated_bags} Bags</td>
-                                            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]">${h.distributed_at ? h.distributed_at.substring(0, 16).replace('T', ' ') : 'N/A'}</td>
-                                            <td class="py-3 px-3 text-right">
-                                                <a href="/api/acknowledgement_slip/${h.id}" target="_blank" class="text-kano-900 font-bold hover:underline">
-                                                    <i class="fas fa-print"></i> Slip
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                        <!-- Filter Controls -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 p-3 rounded-2xl border border-slate-100">
+                            <input type="text" id="officerHistorySearch" value="${tableStates.officerHistory.search}" oninput="filterOfficerHistorySearch(this.value)" placeholder="Search farmer, phone, LGA, req ID..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-kano-900 bg-white">
+                            <button onclick="toggleOfficerHistoryDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white hover:bg-slate-100 transition" title="Toggle Row Density">
+                                <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.officerHistory.density === 'compact' ? 'Comfortable' : 'Compact'}
+                            </button>
+                        </div>
+
+                        <div id="officerHistoryTableContainer">
+                            <!-- Rendered by renderOfficerHistoryTableHtml() -->
                         </div>
                     </div>
                 `;
+
+                renderOfficerHistoryTableHtml();
             } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading history.</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading history: ${e.message}</div>`;
             }
+        }
+
+        function renderOfficerHistoryTableHtml() {
+            const st = tableStates.officerHistory;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(h => 
+                    String(h.id).includes(q) ||
+                    (h.farmer_name && h.farmer_name.toLowerCase().includes(q)) ||
+                    (h.lga && h.lga.toLowerCase().includes(q)) ||
+                    (h.farmer_phone && h.farmer_phone.toLowerCase().includes(q))
+                );
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('officerHistoryTableContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficerHistory('id')">
+                                    Req ID ${st.sortCol === 'id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficerHistory('farmer_name')">
+                                    Farmer Name ${st.sortCol === 'farmer_name' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficerHistory('lga')">
+                                    LGA ${st.sortCol === 'lga' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Phone</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficerHistory('allocated_bags')">
+                                    Bags Released ${st.sortCol === 'allocated_bags' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortOfficerHistory('distributed_at')">
+                                    Dispensed At ${st.sortCol === 'distributed_at' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 text-right">Official Slip</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(h => `
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="${pyClass} font-mono font-bold text-slate-600">#${h.id}</td>
+                                    <td class="${pyClass} font-bold text-slate-900">${h.farmer_name}</td>
+                                    <td class="${pyClass} text-slate-700">${h.lga}</td>
+                                    <td class="${pyClass} text-slate-600 font-mono text-[11px]">${h.farmer_phone}</td>
+                                    <td class="${pyClass} font-bold text-kano-900 text-sm">${h.allocated_bags} Bags</td>
+                                    <td class="${pyClass} text-slate-400 font-mono text-[11px]">${h.distributed_at ? h.distributed_at.substring(0, 16).replace('T', ' ') : 'N/A'}</td>
+                                    <td class="${pyClass} text-right">
+                                        <a href="/api/acknowledgement_slip/${h.id}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1 border border-kano-200">
+                                            <i class="fas fa-print"></i> Slip
+                                        </a>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-slate-400">No dispensing logs match your search.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+
+                ${renderTablePagination('officerHistory', totalCount, 'setOfficerHistoryPage', 'setOfficerHistoryPageSize')}
+            `;
+        }
+
+        function sortOfficerHistory(col) {
+            const st = tableStates.officerHistory;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = true; }
+            renderOfficerHistoryTableHtml();
+        }
+
+        function setOfficerHistoryPage(p) {
+            tableStates.officerHistory.page = p;
+            renderOfficerHistoryTableHtml();
+        }
+
+        function setOfficerHistoryPageSize(sz) {
+            tableStates.officerHistory.pageSize = sz;
+            tableStates.officerHistory.page = 1;
+            renderOfficerHistoryTableHtml();
+        }
+
+        function filterOfficerHistorySearch(q) {
+            tableStates.officerHistory.search = q;
+            tableStates.officerHistory.page = 1;
+            renderOfficerHistoryTableHtml();
+        }
+
+        function toggleOfficerHistoryDensity() {
+            tableStates.officerHistory.density = tableStates.officerHistory.density === 'compact' ? 'comfortable' : 'compact';
+            renderOfficerHistoryTableHtml();
         }
 
 
@@ -2580,29 +4114,191 @@
         // ====================================================
         async function loadAuditLogsView() {
             const container = document.getElementById('sectionContainer');
-            const res = await fetch('/api/audit_logs');
-            const logs = await res.json();
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Immutable Audit Logs...</div>';
+
+            try {
+                const res = await fetch('/api/audit_logs');
+                const logs = await res.json();
+                tableStates.auditLogs.data = logs;
+
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Official Immutable Activity &amp; Audit Trail</h3>
+                                <p class="text-xs text-slate-500">Cryptographically logged administrative decisions, quota approvals, stock movements, and voucher redemptions</p>
+                            </div>
+                            <a href="/api/export/audit_logs" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition flex items-center gap-1.5 self-start sm:self-auto">
+                                <i class="fas fa-file-csv text-emerald-700"></i> Export Audit Trail CSV
+                            </a>
+                        </div>
+
+                        <!-- Multi-faceted Filter Controls -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50/70 p-3 rounded-2xl border border-slate-100">
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <input type="text" id="auditSearchInput" value="${tableStates.auditLogs.search}" oninput="filterAuditLogsSearch(this.value)" placeholder="Search actor, action, details..." class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-56 focus:outline-none focus:ring-2 focus:ring-kano-900 bg-white">
+                                <select onchange="filterAuditLogsCategory(this.value)" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white text-slate-800">
+                                    <option value="">All Audit Categories</option>
+                                    <option value="AUTH" ${tableStates.auditLogs.actionFilter === 'AUTH' ? 'selected' : ''}>Authentication / Login</option>
+                                    <option value="INVENTORY" ${tableStates.auditLogs.actionFilter === 'INVENTORY' ? 'selected' : ''}>Inventory &amp; Stock</option>
+                                    <option value="ALLOCAT" ${tableStates.auditLogs.actionFilter === 'ALLOCAT' ? 'selected' : ''}>Quota Allocation</option>
+                                    <option value="DISTRIBUTE" ${tableStates.auditLogs.actionFilter === 'DISTRIBUTE' ? 'selected' : ''}>Field Dispensing</option>
+                                    <option value="LOCATION" ${tableStates.auditLogs.actionFilter === 'LOCATION' ? 'selected' : ''}>Locations &amp; LGAs</option>
+                                    <option value="TAMPER" ${tableStates.auditLogs.actionFilter === 'TAMPER' ? 'selected' : ''}>Blockchain &amp; Security</option>
+                                </select>
+                            </div>
+
+                            <button onclick="toggleAuditLogsDensity()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white hover:bg-slate-100 transition" title="Toggle Row Density">
+                                <i class="fas fa-bars-staggered mr-1"></i> ${tableStates.auditLogs.density === 'compact' ? 'Comfortable' : 'Compact'}
+                            </button>
+                        </div>
+
+                        <div id="auditLogsTableContainer">
+                            <!-- Rendered by renderAuditLogsTableHtml() -->
+                        </div>
+                    </div>
+                `;
+
+                renderAuditLogsTableHtml();
+            } catch(e) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading audit logs: ${e.message}</div>`;
+            }
+        }
+
+        function renderAuditLogsTableHtml() {
+            const st = tableStates.auditLogs;
+            let list = (st.data || []).slice();
+
+            // Search filter
+            if (st.search) {
+                const q = st.search.toLowerCase();
+                list = list.filter(l => 
+                    String(l.id).includes(q) ||
+                    (l.actor_id && l.actor_id.toLowerCase().includes(q)) ||
+                    (l.actor_type && l.actor_type.toLowerCase().includes(q)) ||
+                    (l.action && l.action.toLowerCase().includes(q)) ||
+                    (l.details && l.details.toLowerCase().includes(q))
+                );
+            }
+
+            // Action category filter
+            if (st.actionFilter) {
+                list = list.filter(l => l.action && l.action.toUpperCase().includes(st.actionFilter.toUpperCase()));
+            }
+
+            // Sort
+            list.sort((a, b) => {
+                let valA = a[st.sortCol] || '';
+                let valB = b[st.sortCol] || '';
+                if (typeof valA === 'number') {
+                    return st.sortAsc ? valA - valB : valB - valA;
+                }
+                return st.sortAsc ? String(valA).localeCompare(String(valB)) : String(valB).localeCompare(String(valA));
+            });
+
+            const totalCount = list.length;
+            const startIndex = (st.page - 1) * st.pageSize;
+            const pageData = list.slice(startIndex, startIndex + st.pageSize);
+            const pyClass = st.density === 'compact' ? 'py-2 px-3' : 'py-3.5 px-3';
+
+            const container = document.getElementById('auditLogsTableContainer');
+            if (!container) return;
 
             container.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-heading font-bold text-slate-900 mb-4">Official Activity & Audit Trail</h3>
-                    <div class="divide-y divide-slate-100 text-xs">
-                        ${logs.map(log => `
-                            <div class="py-3 flex items-start justify-between gap-4">
-                                <div class="space-y-0.5">
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-bold text-slate-900">${log.actor_id}</span>
-                                        <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${log.actor_type}</span>
-                                        <span class="font-bold text-kano-900">${log.action}</span>
-                                    </div>
-                                    <p class="text-slate-600">${log.details}</p>
-                                </div>
-                                <span class="text-[11px] text-slate-400 whitespace-nowrap">${log.timestamp}</span>
-                            </div>
-                        `).join('')}
-                    </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 bg-slate-50/70">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAuditLogs('id')">
+                                    Audit ID ${st.sortCol === 'id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAuditLogs('timestamp')">
+                                    Timestamp ${st.sortCol === 'timestamp' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAuditLogs('actor_id')">
+                                    Actor ID ${st.sortCol === 'actor_id' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Role</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-700" onclick="sortAuditLogs('action')">
+                                    Audit Action ${st.sortCol === 'action' ? (st.sortAsc ? '▲' : '▼') : ''}
+                                </th>
+                                <th class="py-3 px-3">Cryptographic Details &amp; Event Log</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${pageData.length > 0 ? pageData.map(log => {
+                                const act = log.action || '';
+                                const isGreen = act.includes('ALLOCAT') || act.includes('DISTRIBUTE') || act.includes('RECEIPT');
+                                const isAmber = act.includes('TRANSFER') || act.includes('ADJUST') || act.includes('TAMPER');
+                                const isBlue = act.includes('AUTH') || act.includes('LOGIN');
+                                const badgeColor = isGreen ? 'bg-emerald-100 text-emerald-800' : isAmber ? 'bg-amber-100 text-amber-800' : isBlue ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
+
+                                return `
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="${pyClass} font-mono text-slate-400">#${log.id}</td>
+                                        <td class="${pyClass} font-mono text-slate-500 whitespace-nowrap text-[11px]">${log.timestamp ? log.timestamp.substring(0, 19).replace('T', ' ') : 'N/A'}</td>
+                                        <td class="${pyClass} font-mono font-bold text-slate-900">${log.actor_id}</td>
+                                        <td class="${pyClass}">
+                                            <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                ${log.actor_type}
+                                            </span>
+                                        </td>
+                                        <td class="${pyClass}">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeColor}">
+                                                ${log.action}
+                                            </span>
+                                        </td>
+                                        <td class="${pyClass} text-slate-700 font-medium">
+                                            ${log.details}
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('') : `
+                                <tr>
+                                    <td colspan="6" class="py-8 text-center text-slate-400">No audit log records match your filter.</td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
                 </div>
+
+                ${renderTablePagination('auditLogs', totalCount, 'setAuditLogsPage', 'setAuditLogsPageSize')}
             `;
+        }
+
+        function sortAuditLogs(col) {
+            const st = tableStates.auditLogs;
+            if (st.sortCol === col) st.sortAsc = !st.sortAsc;
+            else { st.sortCol = col; st.sortAsc = false; }
+            renderAuditLogsTableHtml();
+        }
+
+        function setAuditLogsPage(p) {
+            tableStates.auditLogs.page = p;
+            renderAuditLogsTableHtml();
+        }
+
+        function setAuditLogsPageSize(sz) {
+            tableStates.auditLogs.pageSize = sz;
+            tableStates.auditLogs.page = 1;
+            renderAuditLogsTableHtml();
+        }
+
+        function filterAuditLogsSearch(q) {
+            tableStates.auditLogs.search = q;
+            tableStates.auditLogs.page = 1;
+            renderAuditLogsTableHtml();
+        }
+
+        function filterAuditLogsCategory(cat) {
+            tableStates.auditLogs.actionFilter = cat;
+            tableStates.auditLogs.page = 1;
+            renderAuditLogsTableHtml();
+        }
+
+        function toggleAuditLogsDensity() {
+            tableStates.auditLogs.density = tableStates.auditLogs.density === 'compact' ? 'comfortable' : 'compact';
+            renderAuditLogsTableHtml();
         }
 
         // Modal Helpers

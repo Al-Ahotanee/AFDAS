@@ -170,6 +170,28 @@ def run_tests():
     res_exp_a = client.get('/api/export/allocations')
     assert_test("Export Allocations CSV", res_exp_a.status_code == 200 and b"Request ID" in res_exp_a.data)
 
+    res_exp_inv = client.get('/api/export/inventory_logs')
+    assert_test("Export Inventory Movement CSV", res_exp_inv.status_code == 200 and b"Log ID" in res_exp_inv.data)
+
+    res_exp_aud = client.get('/api/export/audit_logs')
+    assert_test("Export System Audit CSV", res_exp_aud.status_code == 200 and b"Audit ID" in res_exp_aud.data)
+
+    # 12. Detailed Reporting & Enterprise Analytics
+    res_analytics = client.get('/api/analytics/detailed')
+    ana_d = json.loads(res_analytics.data)
+    assert_test("Detailed Reporting & Analytics API", 'kpi' in ana_d and 'zonal_saturation' in ana_d and 'top_lgas' in ana_d)
+    assert_test("Analytics Financial Telemetry", ana_d['kpi']['total_subsidy_expenditure'] > 0 and ana_d['kpi']['total_smallholder_savings'] > 0)
+
+    # 13. Ministerial Executive Briefing Data
+    res_exec = client.get('/api/reports/executive')
+    exec_d = json.loads(res_exec.data)
+    assert_test("Ministerial Executive Briefing API", 'reference_no' in exec_d and 'signatories' in exec_d and len(exec_d['signatories']) >= 3)
+
+    # 14. Bulk Quota Allocation Engine
+    res_bulk = client.post('/api/requests/bulk_allocate', json={})
+    bulk_d = json.loads(res_bulk.data)
+    assert_test("Bulk Allocation Engine", bulk_d.get('success') is True and bulk_d.get('allocated_count', 0) > 0)
+
     print("\n" + "="*50)
     print(f"ALL WORKFLOW TESTS COMPLETED: {passed}/{total} TESTS PASSED")
     print("="*50)
