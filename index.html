@@ -7,7 +7,7 @@
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN -->
@@ -92,7 +92,6 @@
         <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
             <!-- Header Banner -->
             <div class="bg-gradient-to-r from-kano-900 to-kano-800 text-white p-8 text-center relative overflow-hidden">
-                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
                 <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-gold-400 text-3xl shadow-lg border border-white/10 mb-4">
                     <i class="fas fa-seedling"></i>
                 </div>
@@ -203,7 +202,7 @@
                 </div>
 
                 <!-- Nav Menu Items (Dynamic by Role) -->
-                <nav class="px-3 space-y-1.5 text-xs font-semibold" id="sidebarNav">
+                <nav class="px-3 space-y-1 text-xs font-semibold" id="sidebarNav">
                     <!-- Loaded dynamically via JS -->
                 </nav>
             </div>
@@ -236,7 +235,7 @@
                 <div class="flex items-center gap-3">
                     <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-600">
                         <i class="fas fa-calendar-check text-kano-700"></i>
-                        <span>Season: <strong>2026 Dry-Season Subsidy</strong></span>
+                        <span>Season: <strong>2026 Dry-Season Programme</strong></span>
                     </div>
                     <button onclick="refreshDashboard()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition" title="Refresh Telemetry">
                         <i class="fas fa-rotate"></i>
@@ -253,8 +252,10 @@
 
 
     <!-- ========================================== -->
-    <!--           FARMER REGISTRATION MODAL        -->
+    <!--           ALL SYSTEM MODALS                -->
     <!-- ========================================== -->
+
+    <!-- 1. FARMER REGISTRATION MODAL -->
     <div id="registerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex items-center justify-between pb-4 border-b border-slate-200">
@@ -276,46 +277,33 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Farmer ID (Format: F###)</label>
-                        <input type="text" id="regFarmerId" required placeholder="e.g. F101" pattern="F\d{3,4}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
+                        <input type="text" id="regFarmerId" required placeholder="e.g. F105" pattern="F\d{3,4}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                         <small class="text-[10px] text-slate-500">Must start with 'F' followed by digits</small>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Legal Name</label>
                         <input type="text" id="regName" required placeholder="e.g. Sani Garba Danbatta" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Mobile Phone Number</label>
                         <input type="tel" id="regPhone" required placeholder="08031234567" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">National Identity Number (NIN)</label>
                         <input type="text" id="regNin" placeholder="11-Digit NIN" maxlength="11" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kano LGA (44 Available)</label>
-                        <select id="regLga" required onchange="populateWardsForLga()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
-                            <!-- Populated via JS -->
-                        </select>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kano LGA</label>
+                        <select id="regLga" required onchange="populateWardsForLga()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium"></select>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Ward</label>
-                        <select id="regWard" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
-                            <option value="Central Ward">Central Ward</option>
-                            <option value="North Ward">North Ward</option>
-                            <option value="South Ward">South Ward</option>
-                        </select>
+                        <select id="regWard" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium"></select>
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Farm Size (Hectares)</label>
                         <input type="number" id="regFarmSize" min="0.5" max="50" step="0.5" value="2.0" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Primary Crop Cultivated</label>
                         <select id="regCropType" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
@@ -326,17 +314,14 @@
                             <option value="Soybean & Sesame">Soybean &amp; Sesame</option>
                         </select>
                     </div>
-
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Agricultural Cooperative Society (Optional)</label>
                         <input type="text" id="regCoopName" placeholder="e.g. Danbatta Apex Rice Farmers Cooperative" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Create Access Password</label>
                         <input type="password" id="regPassword" required minlength="6" placeholder="Min 6 characters" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Polling Unit Code</label>
                         <input type="text" id="regPollingUnit" placeholder="e.g. PU-012 Gidan Sarki" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
@@ -352,38 +337,370 @@
     </div>
 
 
-    <!-- ========================================== -->
-    <!--           CREATE SEASON MODAL (ADMIN)      -->
-    <!-- ========================================== -->
-    <div id="createSeasonModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- 2. FARMER REQUEST FERTILIZER MODAL -->
+    <div id="farmerRequestModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200">
             <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-                <h3 class="text-lg font-heading font-extrabold text-slate-900">Launch Distribution Season</h3>
-                <button onclick="document.getElementById('createSeasonModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-kano-100 flex items-center justify-center text-kano-900 font-bold">
+                        <i class="fas fa-hand-holding-dollar text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-heading font-extrabold text-slate-900">Apply for Fertilizer Subsidy</h3>
+                        <p class="text-xs text-slate-500">KNARDA Smallholder Input Allocation Scheme</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('farmerRequestModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="createSeasonForm" class="mt-4 space-y-4">
+
+            <form id="farmerReqForm" onsubmit="submitFarmerFertilizerRequest(event)" class="mt-5 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Season Programme Name</label>
-                    <input type="text" id="seasonNameInput" required placeholder="e.g. 2026 Kano Rainy Season Maize & Rice Initiative" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Active Subsidy Season</label>
+                    <select id="reqSeasonSelect" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium"></select>
                 </div>
+
+                <div class="p-3.5 rounded-2xl bg-kano-50 border border-kano-200 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Applicant:</span>
+                        <strong class="text-slate-900" id="reqFarmerName">Malam</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Registered Farm Acreage:</span>
+                        <strong class="text-slate-900" id="reqFarmSizeDisplay">2.5 ha</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Maximum Eligible Quota:</span>
+                        <strong class="text-kano-900 font-extrabold" id="reqMaxQuotaDisplay">6 Bags (50kg)</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Number of Bags to Request (50kg)</label>
+                    <input type="number" id="reqBagsInput" min="1" max="15" value="6" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-base font-bold text-kano-900">
+                    <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                        <span>Subsidized Cost: <strong class="text-emerald-700" id="reqSubPrice">₦15,000 / bag</strong></span>
+                        <span>Open Market: <strike class="text-red-500" id="reqMktPrice">₦45,000</strike></span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('farmerRequestModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 shadow-md">
+                        Submit Allocation Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 3. ADD INVENTORY STOCK BATCH MODAL -->
+    <div id="addInventoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Add Inventory Stock Batch</h3>
+                <button onclick="document.getElementById('addInventoryModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addStockForm" onsubmit="handleAddInventoryBatch(event)" class="mt-4 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fertilizer Formulation</label>
-                    <select id="seasonFertilizerType" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
-                        <option value="NPK 20:10:10 (Kano Special)">NPK 20:10:10 (Kano Special)</option>
+                    <select id="invFertType" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                        <option value="NPK 20:10:10 (Kano Formulation)">NPK 20:10:10 (Kano Formulation)</option>
                         <option value="Urea 46% Nitrogen">Urea 46% Nitrogen</option>
                         <option value="DAP (Di-Ammonium Phosphate)">DAP (Di-Ammonium Phosphate)</option>
                         <option value="Organic Kano Bio-Fertilizer">Organic Kano Bio-Fertilizer</option>
                     </select>
                 </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Quantity</label>
+                        <input type="number" id="invQty" min="10" value="5000" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Unit</label>
+                        <select id="invUnit" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                            <option value="bags">Bags (50kg)</option>
+                            <option value="metric tons">Metric Tons</option>
+                        </select>
+                    </div>
+                </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Total Subsidized Bags Available</label>
-                    <input type="number" id="seasonBagsInput" min="500" value="50000" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Depot Storage Location</label>
+                    <select id="invLocation" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                        <option value="Dawanau Central Depot">Dawanau Central Depot (Kano Central)</option>
+                        <option value="Bichi Agro-Distribution Depot">Bichi Agro-Distribution Depot (Kano North)</option>
+                        <option value="Rano Zonal Seed & Input Store">Rano Zonal Seed & Input Store (Kano South)</option>
+                        <option value="Kura Irrigation Distribution Hub">Kura Irrigation Distribution Hub (Kano South)</option>
+                        <option value="Gaya Zonal Agro Depot">Gaya Zonal Agro Depot (Kano South)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Batch Number Code</label>
+                    <input type="text" id="invBatch" placeholder="e.g. KN-NPK-2026-09" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Supplier / Production Plant</label>
+                    <input type="text" id="invSupplier" placeholder="e.g. Dangote Fertilizer / Indorama" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
                 </div>
                 <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" onclick="document.getElementById('createSeasonModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Publish Season</button>
+                    <button type="button" onclick="document.getElementById('addInventoryModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Record Batch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 4. INTER-DEPOT STOCK TRANSFER MODAL -->
+    <div id="transferInventoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Inter-Depot Stock Transfer</h3>
+                <button onclick="document.getElementById('transferInventoryModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="transferStockForm" onsubmit="handleTransferInventory(event)" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Source Inventory Batch</label>
+                    <select id="trfSourceId" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Destination Depot</label>
+                    <select id="trfDestLocation" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                        <option value="Bichi Agro-Distribution Depot">Bichi Agro-Distribution Depot (Kano North)</option>
+                        <option value="Rano Zonal Seed & Input Store">Rano Zonal Seed & Input Store (Kano South)</option>
+                        <option value="Kura Irrigation Distribution Hub">Kura Irrigation Distribution Hub (Kano South)</option>
+                        <option value="Dawanau Central Depot">Dawanau Central Depot (Kano Central)</option>
+                        <option value="Gaya Zonal Agro Depot">Gaya Zonal Agro Depot (Kano South)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Quantity of Bags to Transfer</label>
+                    <input type="number" id="trfQty" min="1" max="10000" value="1000" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Driver's Name</label>
+                        <input type="text" id="trfDriver" placeholder="Malam Salisu Driver" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Truck Vehicle Plate</label>
+                        <input type="text" id="trfPlate" placeholder="KNC-428-XA" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono">
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('transferInventoryModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Dispatch Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 5. ADD LGA MODAL -->
+    <div id="addLgaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Add New Kano LGA</h3>
+                <button onclick="document.getElementById('addLgaModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddLga(event)" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">LGA Name</label>
+                    <input type="text" id="newLgaName" required placeholder="e.g. Danbatta" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Senatorial Agricultural Zone</label>
+                    <select id="newLgaZone" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                        <option value="Kano Central">Kano Central Zone</option>
+                        <option value="Kano North">Kano North Zone</option>
+                        <option value="Kano South">Kano South Zone</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Annual Subsidized Quota Ceiling (Bags)</label>
+                    <input type="number" id="newLgaQuota" value="3000" min="500" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addLgaModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Add LGA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 6. ADD WARD MODAL -->
+    <div id="addWardModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Add Ward to LGA</h3>
+                <button onclick="document.getElementById('addWardModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddWard(event)" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Select Parent LGA</label>
+                    <select id="newWardLgaSelect" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Ward Name</label>
+                    <input type="text" id="newWardName" required placeholder="e.g. Fagwalawa Ward" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Assigned Extension Officer</label>
+                    <input type="text" id="newWardOfficer" placeholder="Malam Garba Haruna" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addWardModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Add Ward</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 7. ADD POLLING UNIT MODAL -->
+    <div id="addPuModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Add Polling Unit</h3>
+                <button onclick="document.getElementById('addPuModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddPu(event)" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Parent LGA</label>
+                    <select id="newPuLgaSelect" onchange="cascadeWardsForPu()" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Parent Ward</label>
+                    <select id="newPuWardSelect" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Polling Unit Name</label>
+                    <input type="text" id="newPuName" required placeholder="e.g. Primary School Gate PU-01" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">PU Code</label>
+                    <input type="text" id="newPuCode" placeholder="e.g. PU-08-012" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Community Landmark</label>
+                    <input type="text" id="newPuLandmark" placeholder="Opposite District Head Mosque" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addPuModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Add Polling Unit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 8. FARMER DETAIL & INSPECTION MODAL (ADMIN) -->
+    <div id="farmerDetailModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-kano-100 flex items-center justify-center text-kano-900 font-bold">
+                        <i class="fas fa-address-card text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-heading font-extrabold text-slate-900" id="modalFarmerTitle">Farmer Inspection Dossier</h3>
+                        <p class="text-xs text-slate-500">KNARDA Smallholder Verification Profile</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('farmerDetailModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="farmerDetailContent" class="mt-6 space-y-6">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 9. BILINGUAL SMS SIMULATOR MODAL -->
+    <div id="smsSimulatorModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-kano-100 text-kano-900 mx-auto flex items-center justify-center text-xl mb-3">
+                <i class="fas fa-mobile-screen"></i>
+            </div>
+            <h3 class="font-heading font-bold text-slate-900 text-base">Rural Farmer SMS Alert</h3>
+            <p class="text-xs text-slate-500 mb-4">Simulated SMS dispatched to farmer's mobile phone</p>
+
+            <!-- Phone Mockup Screen -->
+            <div class="rounded-2xl bg-slate-950 p-4 text-left font-mono text-xs text-slate-200 space-y-3 border-4 border-slate-800 shadow-inner">
+                <div class="flex justify-between text-[10px] text-slate-500 border-b border-slate-800 pb-2">
+                    <span>Sender: <strong>KNARDA-AFDAS</strong></span>
+                    <span>Just Now</span>
+                </div>
+                <div>
+                    <span class="text-gold-400 font-bold block mb-1">HAUSA VERSION:</span>
+                    <p class="text-slate-300 leading-relaxed text-[11px]" id="smsHausaText">Loading...</p>
+                </div>
+                <div class="pt-2 border-t border-slate-800">
+                    <span class="text-emerald-400 font-bold block mb-1">ENGLISH VERSION:</span>
+                    <p class="text-slate-300 leading-relaxed text-[11px]" id="smsEnglishText">Loading...</p>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <button onclick="document.getElementById('smsSimulatorModal').classList.add('hidden')" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700">
+                    Close Simulation
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 10. ADD STORE OFFICER MODAL -->
+    <div id="addOfficerModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <h3 class="text-lg font-heading font-extrabold text-slate-900">Enroll Store Officer</h3>
+                <button onclick="document.getElementById('addOfficerModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddOfficer(event)" class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Officer ID (Format: S###)</label>
+                    <input type="text" id="newOfficerId" required placeholder="e.g. S006" pattern="S\d{3}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Officer Full Name</label>
+                    <input type="text" id="newOfficerName" required placeholder="e.g. Malam Danladi Abubakar" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Assigned Zonal Depot</label>
+                    <select id="newOfficerDepot" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                        <option value="Dawanau Central Depot">Dawanau Central Depot (Kano Central)</option>
+                        <option value="Bichi Agro-Distribution Depot">Bichi Agro-Distribution Depot (Kano North)</option>
+                        <option value="Rano Zonal Seed & Input Store">Rano Zonal Seed & Input Store (Kano South)</option>
+                        <option value="Kura Irrigation Distribution Hub">Kura Irrigation Distribution Hub (Kano South)</option>
+                        <option value="Gaya Zonal Agro Depot">Gaya Zonal Agro Depot (Kano South)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Initial Password</label>
+                    <input type="password" id="newOfficerPassword" required value="Officer1" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addOfficerModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950">Enroll Officer</button>
                 </div>
             </form>
         </div>
@@ -398,18 +715,19 @@
         let currentUser = null;
         let activeTab = 'overview';
         let html5QrScannerInstance = null;
+        let cachedLgas = [];
+        let cachedSeasons = [];
 
         // Kano 44 LGAs
         const KANO_44_LGAS = [
             "Ajingi", "Albasu", "Bagwai", "Bebeji", "Bichi", "Bunkure", "Dala", "Danbatta", 
             "Dawakin Kudu", "Dawakin Tofa", "Doguwa", "Fagge", "Gabasawa", "Garko", "Garun Mallam", 
-            "Gaya", "Gwale", "Gwarzo", "Kabo", "Kano Municipal", "Karaye", "Kibiya", "Kiru", 
+            "Gaya", "Gezawa", "Gwale", "Gwarzo", "Kabo", "Kano Municipal", "Karaye", "Kibiya", "Kiru", 
             "Kumbotso", "Kunchi", "Kura", "Madobi", "Makoda", "Minjibir", "Nassarawa", "Rano", 
             "Rimin Gado", "Rogo", "Shanono", "Sumaila", "Takai", "Tarauni", "Tofa", "Tsanyawa", 
             "Tudun Wada", "Ungogo", "Warawa", "Wudil"
         ];
 
-        // Init on DOM Load
         document.addEventListener('DOMContentLoaded', () => {
             initLgaDropdown();
             checkSavedAuth();
@@ -420,18 +738,21 @@
             const select = document.getElementById('regLga');
             if (select) {
                 select.innerHTML = KANO_44_LGAS.map(lga => `<option value="${lga}">${lga}</option>`).join('');
+                populateWardsForLga();
             }
         }
 
         function populateWardsForLga() {
             const lga = document.getElementById('regLga').value;
             const wardSelect = document.getElementById('regWard');
-            wardSelect.innerHTML = `
-                <option value="${lga} Central Ward">${lga} Central Ward</option>
-                <option value="${lga} North Ward">${lga} North Ward</option>
-                <option value="${lga} South Ward">${lga} South Ward</option>
-                <option value="${lga} Rural Agro Ward">${lga} Rural Agro Ward</option>
-            `;
+            if (wardSelect) {
+                wardSelect.innerHTML = `
+                    <option value="${lga} Central Ward">${lga} Central Ward</option>
+                    <option value="${lga} North Ward">${lga} North Ward</option>
+                    <option value="${lga} South Ward">${lga} South Ward</option>
+                    <option value="${lga} Agro Irrigation Ward">${lga} Agro Irrigation Ward</option>
+                `;
+            }
         }
 
         function fillLogin(uid, pwd) {
@@ -452,7 +773,6 @@
         }
 
         function setupEventListeners() {
-            // Login Handler
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const userId = document.getElementById('loginUserId').value.trim();
@@ -477,18 +797,13 @@
                         });
                         showDashboard();
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Authentication Failed',
-                            text: data.message || 'Invalid credentials'
-                        });
+                        Swal.fire({ icon: 'error', title: 'Authentication Failed', text: data.message });
                     }
                 } catch (err) {
                     Swal.fire({ icon: 'error', title: 'Connection Error', text: 'Could not reach server.' });
                 }
             });
 
-            // Register Handler
             document.getElementById('farmerRegisterForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const payload = {
@@ -505,51 +820,19 @@
                     polling_unit: document.getElementById('regPollingUnit').value.trim()
                 };
 
-                try {
-                    const res = await fetch('/api/register/farmer', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        closeRegisterModal();
-                        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Farmer Enrolled!',
-                            text: data.message,
-                            confirmButtonColor: '#046A38'
-                        });
-                        fillLogin(payload.farmer_id, payload.password);
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Registration Failed', text: data.message });
-                    }
-                } catch (err) {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit registration.' });
-                }
-            });
-
-            // Create Season Handler
-            document.getElementById('createSeasonForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const payload = {
-                    name: document.getElementById('seasonNameInput').value.trim(),
-                    fertilizer_type: document.getElementById('seasonFertilizerType').value,
-                    total_bags: parseInt(document.getElementById('seasonBagsInput').value) || 10000,
-                    created_by: currentUser.user_id
-                };
-
-                const res = await fetch('/api/seasons', {
+                const res = await fetch('/api/register/farmer', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    document.getElementById('createSeasonModal').classList.add('hidden');
-                    Swal.fire({ icon: 'success', title: 'Season Published!', text: data.message });
-                    loadAdminView();
+                    closeRegisterModal();
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                    Swal.fire({ icon: 'success', title: 'Farmer Enrolled!', text: data.message, confirmButtonColor: '#046A38' });
+                    fillLogin(payload.farmer_id, payload.password);
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Registration Failed', text: data.message });
                 }
             });
         }
@@ -563,7 +846,6 @@
             document.getElementById('userRoleBadge').innerText = currentUser.user_type;
 
             renderSidebarNav();
-            // Default view depending on role
             if (currentUser.user_type === 'farmer') {
                 switchTab('farmer-portal');
             } else if (currentUser.user_type === 'officer') {
@@ -590,29 +872,29 @@
                 links = [
                     { id: 'overview', icon: 'fa-chart-pie', label: 'Executive Telemetry' },
                     { id: 'allocation-engine', icon: 'fa-brain', label: 'Algorithmic Allocator' },
-                    { id: 'kano-zones', icon: 'fa-map-location-dot', label: '44 LGAs & Depots' },
+                    { id: 'locations-admin', icon: 'fa-map-location-dot', label: 'Locations (LGAs, Wards, PUs)' },
+                    { id: 'warehouse', icon: 'fa-warehouse', label: 'Inventory & Depots' },
                     { id: 'farmers-registry', icon: 'fa-users', label: 'Farmers Registry' },
-                    { id: 'warehouse', icon: 'fa-warehouse', label: 'Inventory Depots' },
+                    { id: 'officers-admin', icon: 'fa-user-tie', label: 'Store Officers' },
                     { id: 'blockchain-explorer', icon: 'fa-link', label: 'Blockchain Ledger' },
                     { id: 'audit-logs', icon: 'fa-clipboard-list', label: 'Audit Trail' }
                 ];
             } else if (currentUser.user_type === 'officer') {
                 links = [
                     { id: 'distribution-terminal', icon: 'fa-qrcode', label: 'Voucher & QR Terminal' },
-                    { id: 'officer-history', icon: 'fa-history', label: 'Distribution Log' },
+                    { id: 'officer-history', icon: 'fa-history', label: 'Dispensing Log' },
                     { id: 'warehouse', icon: 'fa-boxes-stacked', label: 'Depot Stock' }
                 ];
             } else {
                 // Farmer
                 links = [
-                    { id: 'farmer-portal', icon: 'fa-hand-holding-seedling', label: 'My Allocation & Voucher' },
-                    { id: 'farmer-id-card', icon: 'fa-id-card', label: 'Digital Farmer Card' },
-                    { id: 'farmer-apply', icon: 'fa-file-signature', label: 'Apply for Subsidy' }
+                    { id: 'farmer-portal', icon: 'fa-hand-holding-seedling', label: 'My Allocation & Requests' },
+                    { id: 'farmer-id-card', icon: 'fa-id-card', label: 'Digital Farmer Card' }
                 ];
             }
 
             nav.innerHTML = links.map(l => `
-                <button onclick="switchTab('${l.id}')" id="nav-${l.id}" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl transition text-left ${activeTab === l.id ? 'bg-kano-900 text-gold-400 font-bold' : 'text-slate-300 hover:bg-kano-900/50 hover:text-white'}">
+                <button onclick="switchTab('${l.id}')" id="nav-${l.id}" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-left ${activeTab === l.id ? 'bg-kano-900 text-gold-400 font-bold shadow' : 'text-slate-300 hover:bg-kano-900/50 hover:text-white'}">
                     <i class="fas ${l.icon} w-5 text-center text-sm"></i>
                     <span>${l.label}</span>
                 </button>
@@ -623,53 +905,49 @@
             activeTab = tabId;
             renderSidebarNav();
 
-            // Set Title
             const titles = {
-                'overview': ['Executive Overview', 'Kano State Agricultural Development Agency Real-Time Metrics'],
+                'overview': ['Executive Overview', 'Kano Agricultural Development Agency Real-Time Metrics'],
                 'allocation-engine': ['Algorithmic Allocation Engine', 'Smart Quota Optimization Based on Acreage, Crop Priority & Cooperatives'],
-                'kano-zones': ['Kano 44 LGAs Spatial Explorer', 'Zonal distribution tracking across Central, North, and South senatorial belts'],
-                'farmers-registry': ['Enrolled Farmers Registry', 'Verified smallholders with NIN, acreage, and photo inspection'],
-                'warehouse': ['Depots & Strategic Inventory', 'Zonal buffer stocks at Dawanau, Bichi, Rano, and Kura'],
-                'blockchain-explorer': ['Blockchain Ledger Explorer', 'SHA-256 cryptographic distribution chain & integrity validator'],
+                'locations-admin': ['Locations & Zonal Administration', 'Manage Senatorial Zones, Kano 44 LGAs, Wards, and Polling Units'],
+                'farmers-registry': ['Enrolled Farmers Registry', 'Verified smallholders with NIN, acreage, photo and cooperative records'],
+                'warehouse': ['Depots & Strategic Inventory Management', 'Manage buffer stock batches, inter-depot transfers, and warehouse logs'],
+                'officers-admin': ['Store Officers Administration', 'Depot assignment, authorized personnel, and dispensing logs'],
+                'blockchain-explorer': ['Blockchain Ledger Explorer', 'SHA-256 cryptographic distribution chain & tamper demonstrator'],
                 'audit-logs': ['Immutable Audit Trail', 'Real-time state monitoring of all logins, allocations, and redemptions'],
                 'distribution-terminal': ['Distribution Point Verification Terminal', 'Scan farmer QR code or verify 6-digit SMS voucher tokens'],
                 'officer-history': ['Officer Dispensing Log', 'Historical records of fertilizer released at this center'],
-                'farmer-portal': ['My Subsidy Allocation & QR Voucher', 'Official KNARDA allocation pass and collection tokens'],
-                'farmer-id-card': ['Digital Farmer Identity Card', 'Official government credentials with embedded cryptographic QR'],
-                'farmer-apply': ['Apply for New Subsidy Programme', 'Submit farming data for dry-season / wet-season allocations']
+                'farmer-portal': ['My Subsidy Allocation & QR Voucher', 'Submit requests, view allocated quotas, QR vouchers, and SMS OTPs'],
+                'farmer-id-card': ['Digital Farmer Identity Card', 'Official government credentials with embedded cryptographic QR']
             };
 
             const t = titles[tabId] || ['Dashboard', 'KNARDA AFDAS'];
             document.getElementById('currentSectionTitle').innerText = t[0];
             document.getElementById('currentSectionSubtitle').innerText = t[1];
 
-            // Render Tab Content
             const container = document.getElementById('sectionContainer');
             if (tabId === 'overview') loadOverviewView();
             else if (tabId === 'allocation-engine') loadAllocationEngineView();
-            else if (tabId === 'kano-zones') loadKanoZonesView();
+            else if (tabId === 'locations-admin') loadLocationsAdminView();
             else if (tabId === 'farmers-registry') loadFarmersRegistryView();
             else if (tabId === 'warehouse') loadWarehouseView();
+            else if (tabId === 'officers-admin') loadOfficersAdminView();
             else if (tabId === 'blockchain-explorer') loadBlockchainExplorerView();
             else if (tabId === 'audit-logs') loadAuditLogsView();
             else if (tabId === 'distribution-terminal') loadDistributionTerminalView();
             else if (tabId === 'officer-history') loadOfficerHistoryView();
             else if (tabId === 'farmer-portal') loadFarmerPortalView();
             else if (tabId === 'farmer-id-card') loadFarmerIdCardView();
-            else if (tabId === 'farmer-apply') loadFarmerApplyView();
         }
 
         function refreshDashboard() {
             switchTab(activeTab);
-            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Data Refreshed', timer: 1200, showConfirmButton: false });
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Data Refreshed', timer: 1000, showConfirmButton: false });
         }
 
 
         // ====================================================
-        //  VIEW RENDERERS
+        //  VIEW 1: ADMIN OVERVIEW
         // ====================================================
-
-        // 1. ADMIN OVERVIEW
         async function loadOverviewView() {
             const container = document.getElementById('sectionContainer');
             container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading live state metrics...</div>';
@@ -683,7 +961,6 @@
                 const zones = await zonesRes.json();
 
                 container.innerHTML = `
-                    <!-- 4 Metric Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
                             <div>
@@ -730,9 +1007,7 @@
                         </div>
                     </div>
 
-                    <!-- Visual Charts Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- Senatorial Belts Distribution Chart -->
                         <div class="lg:col-span-8 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                             <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                                 <div>
@@ -746,10 +1021,8 @@
                             </div>
                         </div>
 
-                        <!-- Rapid Actions & Quick Telemetry -->
                         <div class="lg:col-span-4 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                            <h3 class="text-base font-heading font-bold text-slate-900">Zonal Distribution Quotas</h3>
-                            
+                            <h3 class="text-base font-heading font-bold text-slate-900">Zonal Allocation Quotas</h3>
                             <div class="space-y-3 text-xs">
                                 <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
                                     <div class="flex justify-between font-bold text-slate-800">
@@ -760,7 +1033,6 @@
                                         <div class="bg-kano-900 h-2 rounded-full" style="width: 75%"></div>
                                     </div>
                                 </div>
-
                                 <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
                                     <div class="flex justify-between font-bold text-slate-800">
                                         <span>Kano South (Kura, Rano, Gaya)</span>
@@ -770,7 +1042,6 @@
                                         <div class="bg-gold-500 h-2 rounded-full" style="width: 65%"></div>
                                     </div>
                                 </div>
-
                                 <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
                                     <div class="flex justify-between font-bold text-slate-800">
                                         <span>Kano Central (Urban/Peri-Urban)</span>
@@ -781,20 +1052,18 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                            <div class="pt-2 flex flex-col gap-2">
                                 <button onclick="switchTab('allocation-engine')" class="w-full py-2.5 rounded-xl font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 transition text-center shadow-sm">
                                     <i class="fas fa-brain mr-1.5 text-gold-400"></i> Open Allocation Engine
                                 </button>
-                                <button onclick="document.getElementById('createSeasonModal').classList.remove('hidden')" class="w-full py-2 rounded-xl font-semibold text-xs text-kano-900 bg-kano-100 hover:bg-kano-200 transition text-center">
-                                    <i class="fas fa-plus mr-1"></i> Publish New Season
+                                <button onclick="switchTab('warehouse')" class="w-full py-2 rounded-xl font-semibold text-xs text-kano-900 bg-kano-100 hover:bg-kano-200 transition text-center">
+                                    <i class="fas fa-boxes-stacked mr-1"></i> Manage Zonal Inventory
                                 </button>
                             </div>
                         </div>
                     </div>
                 `;
 
-                // Render Chart.js
                 const ctx = document.getElementById('zonalChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -815,19 +1084,663 @@
                             }
                         ]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top' } }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false }
                 });
 
             } catch (err) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load overview data: ${err.message}</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load overview: ${err.message}</div>`;
             }
         }
 
-        // 2. ALLOCATION ENGINE (SMART ALGORITHMIC ALLOCATOR)
+
+        // ====================================================
+        //  VIEW 2: INVENTORY & DEPOTS MANAGEMENT (ADMIN)
+        // ====================================================
+        async function loadWarehouseView() {
+            const container = document.getElementById('sectionContainer');
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Inventory Batches & Movements...</div>';
+
+            try {
+                const [invRes, logsRes] = await Promise.all([
+                    fetch('/api/inventory'),
+                    fetch('/api/inventory/logs')
+                ]);
+                const batches = await invRes.json();
+                const logs = await logsRes.json();
+
+                const totalBags = batches.reduce((acc, b) => acc + b.quantity, 0);
+
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Zonal Strategic Inventory &amp; Depots</h2>
+                            <p class="text-xs text-slate-500">Live storage levels across Dawanau, Bichi, Rano, Kura, and Gaya input hubs.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="openAddStockModal()" class="px-4 py-2.5 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
+                                <i class="fas fa-plus"></i> Add Stock Batch
+                            </button>
+                            <button onclick="openTransferModal()" class="px-4 py-2.5 rounded-xl bg-gold-500 text-kano-950 font-bold text-xs hover:bg-gold-400 transition flex items-center gap-1.5 shadow">
+                                <i class="fas fa-truck-moving"></i> Inter-Depot Transfer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Batches Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${batches.map(b => `
+                            <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2 hover:border-kano-700 transition">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-kano-100 text-kano-900 font-mono">${b.batch_number}</span>
+                                    <span class="text-xs text-slate-400 font-mono">${b.unit}</span>
+                                </div>
+                                <h4 class="font-heading font-bold text-slate-900 text-sm">${b.fertilizer_type}</h4>
+                                <div class="text-2xl font-extrabold text-kano-900">${b.quantity.toLocaleString()}</div>
+                                <p class="text-[11px] text-slate-500"><i class="fas fa-location-dot text-slate-400 mr-1"></i> ${b.location}</p>
+                                <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[10px]">
+                                    <span class="text-slate-400">Supplier: ${b.supplier || 'KNARDA'}</span>
+                                    <button onclick="promptAdjustStock(${b.id}, '${b.fertilizer_type}', ${b.quantity})" class="text-kano-900 font-bold hover:underline">Adjust</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Warehouse Stock Movement Ledger -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Warehouse Stock Movement Ledger</h3>
+                                <p class="text-xs text-slate-500">Immutable trace of all batch receptions, inter-depot transfers, and dispensing</p>
+                            </div>
+                            <span class="text-xs font-bold text-kano-900 bg-kano-50 px-3 py-1 rounded-full border border-kano-200">${logs.length} Transactions</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
+                                        <th class="py-3 px-3">Log ID</th>
+                                        <th class="py-3 px-3">Action</th>
+                                        <th class="py-3 px-3">Fertilizer</th>
+                                        <th class="py-3 px-3">Quantity</th>
+                                        <th class="py-3 px-3">Source / Origin</th>
+                                        <th class="py-3 px-3">Destination</th>
+                                        <th class="py-3 px-3">Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${logs.map(l => `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="py-3 px-3 font-mono text-slate-500">#${l.id}</td>
+                                            <td class="py-3 px-3">
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${l.action.includes('TRANSFER') ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                                    ${l.action}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 font-semibold text-slate-800">${l.fertilizer_type}</td>
+                                            <td class="py-3 px-3 font-bold text-kano-900">${l.quantity_change > 0 ? '+' : ''}${l.quantity_change || l.quantity} Bags</td>
+                                            <td class="py-3 px-3 text-slate-600">${l.source || 'N/A'}</td>
+                                            <td class="py-3 px-3 font-medium text-slate-800">${l.destination || 'N/A'}</td>
+                                            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]">${l.timestamp.substring(0, 16).replace('T', ' ')}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading inventory: ${err.message}</div>`;
+            }
+        }
+
+        function openAddStockModal() {
+            document.getElementById('addInventoryModal').classList.remove('hidden');
+        }
+
+        async function handleAddInventoryBatch(e) {
+            e.preventDefault();
+            const payload = {
+                fertilizer_type: document.getElementById('invFertType').value,
+                quantity: parseInt(document.getElementById('invQty').value) || 1000,
+                unit: document.getElementById('invUnit').value,
+                location: document.getElementById('invLocation').value,
+                batch_number: document.getElementById('invBatch').value.trim() || `KN-BATCH-${Math.floor(Math.random()*900)+100}`,
+                supplier: document.getElementById('invSupplier').value.trim() || 'Kano Ministry of Agriculture',
+                actor_id: currentUser.user_id
+            };
+
+            const res = await fetch('/api/inventory', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('addInventoryModal').classList.add('hidden');
+                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+                Swal.fire({ icon: 'success', title: 'Batch Recorded!', text: data.message });
+                loadWarehouseView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+        async function openTransferModal() {
+            const res = await fetch('/api/inventory');
+            const batches = await res.json();
+            const select = document.getElementById('trfSourceId');
+            select.innerHTML = batches.map(b => `<option value="${b.id}">${b.fertilizer_type} (${b.quantity} bags at ${b.location})</option>`).join('');
+            document.getElementById('transferInventoryModal').classList.remove('hidden');
+        }
+
+        async function handleTransferInventory(e) {
+            e.preventDefault();
+            const payload = {
+                source_inventory_id: parseInt(document.getElementById('trfSourceId').value),
+                destination_location: document.getElementById('trfDestLocation').value,
+                quantity: parseInt(document.getElementById('trfQty').value),
+                driver_name: document.getElementById('trfDriver').value.trim(),
+                vehicle_plate: document.getElementById('trfPlate').value.trim(),
+                actor_id: currentUser.user_id
+            };
+
+            const res = await fetch('/api/inventory/transfer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('transferInventoryModal').classList.add('hidden');
+                Swal.fire({ icon: 'success', title: 'Transfer Dispatched!', text: data.message });
+                loadWarehouseView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+        async function promptAdjustStock(invId, fertType, currentQty) {
+            const { value: formValues } = await Swal.fire({
+                title: `Adjust Stock: ${fertType}`,
+                html: `
+                    <p class="text-xs text-slate-500 mb-3">Current Balance: <strong>${currentQty} bags</strong></p>
+                    <label class="block text-xs font-bold text-left mb-1">Adjustment Quantity (+ to add, - to deduct):</label>
+                    <input id="swal-adj-qty" type="number" class="swal2-input text-sm" placeholder="e.g. 500 or -200">
+                    <label class="block text-xs font-bold text-left mb-1 mt-2">Reason / Audit Note:</label>
+                    <input id="swal-adj-reason" type="text" class="swal2-input text-sm" placeholder="e.g. Emergency buffer restock">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#046A38',
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-adj-qty').value,
+                        document.getElementById('swal-adj-reason').value
+                    ];
+                }
+            });
+
+            if (formValues && formValues[0]) {
+                const adj = parseInt(formValues[0]);
+                const reason = formValues[1] || 'Stock Adjustment';
+                const res = await fetch('/api/inventory/adjust', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ inventory_id: invId, adjustment: adj, reason, actor_id: currentUser.user_id })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    Swal.fire({ icon: 'success', title: 'Adjusted!', text: data.message });
+                    loadWarehouseView();
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message });
+                }
+            }
+        }
+
+
+        // ====================================================
+        //  VIEW 3: LOCATIONS ADMINISTRATION (ADMIN)
+        // ====================================================
+        async function loadLocationsAdminView() {
+            const container = document.getElementById('sectionContainer');
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Kano 44 LGAs, Wards & Polling Units...</div>';
+
+            try {
+                const [lgasRes, hierRes] = await Promise.all([
+                    fetch('/api/locations/lga'),
+                    fetch('/api/locations/hierarchy')
+                ]);
+                cachedLgas = await lgasRes.json();
+                const hier = await hierRes.json();
+
+                container.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
+                        <div>
+                            <h2 class="text-xl font-heading font-extrabold text-slate-900">Locations &amp; Administrative Hierarchy</h2>
+                            <p class="text-xs text-slate-500">Configure Senatorial Zones, Kano's 44 LGAs, Wards, and Polling Units for quota distribution.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="openAddLgaModal()" class="px-3.5 py-2 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1 shadow">
+                                <i class="fas fa-plus"></i> Add LGA
+                            </button>
+                            <button onclick="openAddWardModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 text-white font-bold text-xs hover:bg-slate-900 transition flex items-center gap-1 shadow">
+                                <i class="fas fa-plus"></i> Add Ward
+                            </button>
+                            <button onclick="openAddPuModal()" class="px-3.5 py-2 rounded-xl bg-gold-500 text-kano-950 font-bold text-xs hover:bg-gold-400 transition flex items-center gap-1 shadow">
+                                <i class="fas fa-plus"></i> Add PU
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Senatorial Zones Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano Central</span>
+                                <span class="text-xs font-bold text-slate-500">${hier['Kano Central'].length} LGAs</span>
+                            </div>
+                            <h3 class="text-base font-heading font-bold text-slate-900">Peri-Urban &amp; Grain Hub</h3>
+                            <p class="text-xs text-slate-500">Dawanau Central Depot &bull; Dala, Fagge, Gwale, Municipal, Nassarawa, Tarauni, Kumbotso, Ungogo</p>
+                        </div>
+
+                        <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano North</span>
+                                <span class="text-xs font-bold text-slate-500">${hier['Kano North'].length} LGAs</span>
+                            </div>
+                            <h3 class="text-base font-heading font-bold text-slate-900">Grain &amp; Wheat Belt</h3>
+                            <p class="text-xs text-slate-500">Bichi Depot &bull; Danbatta, Bichi, Bagwai, Shanono, Gwarzo, Kabo, Kunchi, Makoda, Tsanyawa, Tofa</p>
+                        </div>
+
+                        <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-kano-100 text-kano-900">Kano South</span>
+                                <span class="text-xs font-bold text-slate-500">${hier['Kano South'].length} LGAs</span>
+                            </div>
+                            <h3 class="text-base font-heading font-bold text-slate-900">Rice &amp; Irrigation Basin</h3>
+                            <p class="text-xs text-slate-500">Rano &amp; Kura Depots &bull; Kadawa Valley, Gaya, Tudun Wada, Wudil, Doguwa, Albasu, Takai, Kiru</p>
+                        </div>
+                    </div>
+
+                    <!-- 44 LGAs Directory Table -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Kano State 44 LGAs &bull; Quotas &amp; Wards</h3>
+                                <p class="text-xs text-slate-500">Detailed register with assigned annual subsidy quotas</p>
+                            </div>
+                            <input type="text" id="lgaSearchAdmin" oninput="filterAdminLgaTable()" placeholder="Search LGA or Zone..." class="px-4 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-64">
+                        </div>
+
+                        <div class="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left text-xs" id="adminLgaTable">
+                                <thead>
+                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 sticky top-0 bg-white">
+                                        <th class="py-3 px-3">#</th>
+                                        <th class="py-3 px-3">LGA Name</th>
+                                        <th class="py-3 px-3">Zone</th>
+                                        <th class="py-3 px-3">Headquarters</th>
+                                        <th class="py-3 px-3">Wards</th>
+                                        <th class="py-3 px-3">Quota (Bags)</th>
+                                        <th class="py-3 px-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${cachedLgas.map((lga, idx) => `
+                                        <tr class="hover:bg-slate-50 transition lga-admin-row">
+                                            <td class="py-3 px-3 font-mono text-slate-400">${idx + 1}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-900">${lga.name}</td>
+                                            <td class="py-3 px-3">
+                                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${lga.zone === 'Kano North' ? 'bg-amber-100 text-amber-800' : lga.zone === 'Kano South' ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800'}">
+                                                    ${lga.zone}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 text-slate-600">${lga.headquarters || lga.name + ' Town'}</td>
+                                            <td class="py-3 px-3 font-semibold text-slate-700">3 Wards</td>
+                                            <td class="py-3 px-3 font-bold text-kano-900">${(lga.total_quota || 2500).toLocaleString()} Bags</td>
+                                            <td class="py-3 px-3 text-right">
+                                                <button onclick="deleteLgaItem(${lga.id}, '${lga.name}')" class="text-red-500 hover:text-red-700 font-bold text-xs p-1">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading locations: ${e.message}</div>`;
+            }
+        }
+
+        function filterAdminLgaTable() {
+            const query = document.getElementById('lgaSearchAdmin').value.toLowerCase();
+            document.querySelectorAll('.lga-admin-row').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function openAddLgaModal() {
+            document.getElementById('addLgaModal').classList.remove('hidden');
+        }
+
+        async function handleAddLga(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('newLgaName').value.trim(),
+                zone: document.getElementById('newLgaZone').value,
+                total_quota: parseInt(document.getElementById('newLgaQuota').value) || 2500
+            };
+            const res = await fetch('/api/locations/lga', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('addLgaModal').classList.add('hidden');
+                Swal.fire({ icon: 'success', title: 'LGA Added!', text: data.message });
+                loadLocationsAdminView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+        async function deleteLgaItem(lgaId, name) {
+            const confirmed = await Swal.fire({
+                title: `Delete ${name}?`,
+                text: 'This will also remove associated wards and polling units.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, delete'
+            });
+            if (confirmed.isConfirmed) {
+                const res = await fetch(`/api/locations/lga/${lgaId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    Swal.fire({ icon: 'success', title: 'Removed', text: data.message });
+                    loadLocationsAdminView();
+                }
+            }
+        }
+
+        async function openAddWardModal() {
+            const res = await fetch('/api/locations/lga');
+            const lgas = await res.json();
+            const select = document.getElementById('newWardLgaSelect');
+            select.innerHTML = lgas.map(l => `<option value="${l.id}">${l.name} (${l.zone})</option>`).join('');
+            document.getElementById('addWardModal').classList.remove('hidden');
+        }
+
+        async function handleAddWard(e) {
+            e.preventDefault();
+            const payload = {
+                lga_id: parseInt(document.getElementById('newWardLgaSelect').value),
+                name: document.getElementById('newWardName').value.trim(),
+                extension_officer: document.getElementById('newWardOfficer').value.trim() || 'Agricultural Officer'
+            };
+            const res = await fetch('/api/locations/ward', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('addWardModal').classList.add('hidden');
+                Swal.fire({ icon: 'success', title: 'Ward Added!', text: data.message });
+                loadLocationsAdminView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+        async function openAddPuModal() {
+            const res = await fetch('/api/locations/lga');
+            const lgas = await res.json();
+            cachedLgas = lgas;
+            const select = document.getElementById('newPuLgaSelect');
+            select.innerHTML = lgas.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+            await cascadeWardsForPu();
+            document.getElementById('addPuModal').classList.remove('hidden');
+        }
+
+        async function cascadeWardsForPu() {
+            const lgaId = document.getElementById('newPuLgaSelect').value;
+            const res = await fetch(`/api/locations/ward/${lgaId}`);
+            const wards = await res.json();
+            const select = document.getElementById('newPuWardSelect');
+            if (wards.length > 0) {
+                select.innerHTML = wards.map(w => `<option value="${w.id}">${w.name}</option>`).join('');
+            } else {
+                select.innerHTML = `<option value="1">Central Ward</option>`;
+            }
+        }
+
+        async function handleAddPu(e) {
+            e.preventDefault();
+            const payload = {
+                ward_id: parseInt(document.getElementById('newPuWardSelect').value),
+                name: document.getElementById('newPuName').value.trim(),
+                pu_code: document.getElementById('newPuCode').value.trim(),
+                landmark: document.getElementById('newPuLandmark').value.trim()
+            };
+            const res = await fetch('/api/locations/polling_unit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('addPuModal').classList.add('hidden');
+                Swal.fire({ icon: 'success', title: 'PU Added!', text: data.message });
+                loadLocationsAdminView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+
+        // ====================================================
+        //  VIEW 4: FARMERS REGISTRY & INSPECTION (ADMIN)
+        // ====================================================
+        async function loadFarmersRegistryView() {
+            const container = document.getElementById('sectionContainer');
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Enrolled Farmers...</div>';
+
+            try {
+                const res = await fetch('/api/farmers');
+                const farmers = await res.json();
+
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Enrolled Kano Farmers Directory</h3>
+                                <p class="text-xs text-slate-500">Click any farmer to inspect passport photo, cooperative evidence, and NIN</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="/api/export/farmers" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5 border border-slate-200">
+                                    <i class="fas fa-file-csv text-emerald-700"></i> Export CSV
+                                </a>
+                                <button onclick="openRegisterModal()" class="px-4 py-2 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
+                                    <i class="fas fa-plus"></i> Enroll Farmer
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
+                                        <th class="py-3 px-3">Farmer ID</th>
+                                        <th class="py-3 px-3">Full Name</th>
+                                        <th class="py-3 px-3">Phone</th>
+                                        <th class="py-3 px-3">LGA / Ward</th>
+                                        <th class="py-3 px-3">Acreage &amp; Crop</th>
+                                        <th class="py-3 px-3">Cooperative</th>
+                                        <th class="py-3 px-3 text-right">Lifetime Bags</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${farmers.map(f => `
+                                        <tr onclick="inspectFarmerProfile('${f.id}')" class="hover:bg-kano-50/60 cursor-pointer transition">
+                                            <td class="py-3 px-3 font-mono font-bold text-kano-900">${f.id}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-900">${f.name}</td>
+                                            <td class="py-3 px-3 text-slate-600">${f.phone}</td>
+                                            <td class="py-3 px-3 text-slate-700">${f.lga} <span class="text-slate-400 font-normal">(${f.ward})</span></td>
+                                            <td class="py-3 px-3">
+                                                <span class="font-bold text-slate-800">${f.farm_size} ha</span> &bull; 
+                                                <span class="text-slate-500">${f.crop_type}</span>
+                                            </td>
+                                            <td class="py-3 px-3 text-slate-600">${f.coop_name || '<span class="text-slate-400">None</span>'}</td>
+                                            <td class="py-3 px-3 text-right font-bold text-emerald-700">${f.total_bags_received} Bags</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load farmers list.</div>`;
+            }
+        }
+
+        async function inspectFarmerProfile(farmerId) {
+            Swal.fire({ title: 'Loading Farmer Dossier...', didOpen: () => Swal.showLoading() });
+            const res = await fetch(`/api/farmers/${farmerId}`);
+            const f = await res.json();
+            Swal.close();
+
+            const content = document.getElementById('farmerDetailContent');
+            content.innerHTML = `
+                <div class="flex items-center gap-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                    <img src="${f.passport_photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'}" class="w-24 h-24 rounded-2xl object-cover border-2 border-kano-900 shadow">
+                    <div class="space-y-1">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">KNARDA BIOMETRIC VERIFIED</span>
+                        <h4 class="text-lg font-heading font-extrabold text-slate-900">${f.name}</h4>
+                        <div class="text-xs font-mono font-bold text-kano-900">${f.id} &bull; NIN: <span class="text-slate-700">${f.nin || '23456789012'}</span></div>
+                        <p class="text-xs text-slate-600">${f.lga} LGA &bull; ${f.ward} &bull; ${f.polling_unit}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="p-3 rounded-xl bg-white border border-slate-200">
+                        <span class="text-slate-400 block mb-1">Farm Acreage & Crop:</span>
+                        <strong class="text-slate-900 text-sm">${f.farm_size} Hectares</strong>
+                        <div class="text-slate-500 mt-0.5">${f.crop_type}</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white border border-slate-200">
+                        <span class="text-slate-400 block mb-1">Cooperative Apex:</span>
+                        <strong class="text-slate-900 text-sm">${f.coop_name || 'Individual Smallholder'}</strong>
+                        <div class="text-emerald-700 font-semibold mt-0.5"><i class="fas fa-check-circle"></i> Evidence Document Validated</div>
+                    </div>
+                </div>
+
+                <!-- Applications History -->
+                <div>
+                    <h5 class="text-xs font-bold text-slate-700 uppercase mb-2">Subsidy Requests & Allocations (${f.requests ? f.requests.length : 0})</h5>
+                    <div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                        ${(f.requests || []).map(r => `
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="font-bold text-slate-900">Application #${r.id}</span>
+                                    <div class="text-slate-500 text-[11px]">Requested: ${r.requested_bags} | Allocated: <strong class="text-kano-900">${r.allocated_bags} Bags</strong></div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'distributed' ? 'bg-emerald-100 text-emerald-800' : 'bg-gold-100 text-gold-800'}">${r.status.toUpperCase()}</span>
+                                    <div class="mt-1">
+                                        <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="text-kano-900 font-bold hover:underline text-[11px]">View Slip</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('farmerDetailModal').classList.remove('hidden');
+        }
+
+
+        // ====================================================
+        //  VIEW 5: STORE OFFICERS MANAGEMENT (ADMIN)
+        // ====================================================
+        async function loadOfficersAdminView() {
+            const container = document.getElementById('sectionContainer');
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Store Officers...</div>';
+
+            try {
+                const res = await fetch('/api/officers');
+                const officers = await res.json();
+
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Authorized Zonal Store Officers</h3>
+                                <p class="text-xs text-slate-500">Personnel authorized to operate QR scanner terminals and dispense fertilizer</p>
+                            </div>
+                            <button onclick="document.getElementById('addOfficerModal').classList.remove('hidden')" class="px-4 py-2 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5 shadow">
+                                <i class="fas fa-user-plus"></i> Enroll Store Officer
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${officers.map(o => `
+                                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-kano-100 text-kano-900">${o.id}</span>
+                                        <span class="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">ACTIVE TERMINAL</span>
+                                    </div>
+                                    <h4 class="font-heading font-bold text-slate-900 text-base">${o.name}</h4>
+                                    <p class="text-xs text-slate-600"><i class="fas fa-warehouse text-slate-400 mr-1"></i> ${o.location}</p>
+                                    <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
+                                        <span class="text-slate-500">Total Dispensed:</span>
+                                        <strong class="text-kano-900 font-extrabold text-sm">${o.total_dispensed || 0} Bags</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading officers.</div>`;
+            }
+        }
+
+        async function handleAddOfficer(e) {
+            e.preventDefault();
+            const payload = {
+                officer_id: document.getElementById('newOfficerId').value.trim(),
+                name: document.getElementById('newOfficerName').value.trim(),
+                location: document.getElementById('newOfficerDepot').value,
+                password: document.getElementById('newOfficerPassword').value
+            };
+            const res = await fetch('/api/officers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('addOfficerModal').classList.add('hidden');
+                Swal.fire({ icon: 'success', title: 'Officer Registered!', text: data.message });
+                loadOfficersAdminView();
+            } else {
+                Swal.fire({ icon: 'error', text: data.message });
+            }
+        }
+
+
+        // ====================================================
+        //  VIEW 6: ALLOCATION ENGINE & SIMULATOR (ADMIN)
+        // ====================================================
         async function loadAllocationEngineView() {
             const container = document.getElementById('sectionContainer');
             container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Season Allocation Engine...</div>';
@@ -852,21 +1765,30 @@
                                 <p class="text-xs text-slate-300 mt-1">Formulation: <strong>${activeSeason ? activeSeason.fertilizer_type : 'NPK'}</strong> &bull; Total Subsidy Pool: <strong>${activeSeason ? activeSeason.total_bags.toLocaleString() : 0} Bags</strong></p>
                             </div>
                             
-                            <button onclick="runAllocationEngine(${activeSeason ? activeSeason.id : 1})" class="px-7 py-3.5 rounded-2xl font-heading font-extrabold text-sm text-kano-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 transition-all transform hover:-translate-y-0.5 shadow-xl flex items-center gap-2">
-                                <i class="fas fa-wand-magic-sparkles"></i>
-                                <span>Execute Algorithmic Allocation</span>
-                            </button>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <button onclick="openQuotaSimulatorModal()" class="px-5 py-3 rounded-2xl font-heading font-bold text-xs text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur transition flex items-center gap-1.5">
+                                    <i class="fas fa-sliders text-gold-400"></i> What-If Simulator
+                                </button>
+                                <button onclick="runAllocationEngine(${activeSeason ? activeSeason.id : 1})" class="px-7 py-3.5 rounded-2xl font-heading font-extrabold text-sm text-kano-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 transition-all transform hover:-translate-y-0.5 shadow-xl flex items-center gap-2">
+                                    <i class="fas fa-wand-magic-sparkles"></i>
+                                    <span>Execute Algorithmic Allocation</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Pending Requests for this Season -->
                     <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                         <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
                             <div>
                                 <h3 class="text-base font-heading font-bold text-slate-900">Farmer Quota Applications</h3>
                                 <p class="text-xs text-slate-500">Applications queued for algorithmic quota allocation</p>
                             </div>
-                            <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">${requests.length} Submissions</span>
+                            <div class="flex items-center gap-2">
+                                <a href="/api/export/allocations" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200 flex items-center gap-1">
+                                    <i class="fas fa-file-csv text-emerald-700"></i> Export CSV
+                                </a>
+                                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">${requests.length} Submissions</span>
+                            </div>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -898,8 +1820,11 @@
                                                     ${r.status.toUpperCase()}
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-3 text-right">
-                                                <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="px-3 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1 border border-kano-200">
+                                            <td class="py-3 px-3 text-right space-x-1">
+                                                <button onclick="openSmsSimulator(${r.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] inline-flex items-center gap-1">
+                                                    <i class="fas fa-sms text-kano-900"></i> SMS
+                                                </button>
+                                                <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1 border border-kano-200">
                                                     <i class="fas fa-print"></i> Slip
                                                 </a>
                                             </td>
@@ -928,12 +1853,7 @@
                 const data = await res.json();
                 if (res.ok && data.success) {
                     confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Allocation Complete!',
-                        text: data.message,
-                        confirmButtonColor: '#046A38'
-                    });
+                    Swal.fire({ icon: 'success', title: 'Allocation Complete!', text: data.message, confirmButtonColor: '#046A38' });
                     loadAllocationEngineView();
                 } else {
                     Swal.fire({ icon: 'info', title: 'Notice', text: data.message || 'No pending applications.' });
@@ -943,78 +1863,159 @@
             }
         }
 
-        // 3. KANO 44 LGAs & ZONES EXPLORER
-        async function loadKanoZonesView() {
-            const container = document.getElementById('sectionContainer');
-            container.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
+        async function openQuotaSimulatorModal() {
+            const { value: formValues } = await Swal.fire({
+                title: 'What-If Quota Simulation',
+                html: `
+                    <p class="text-xs text-slate-500 mb-4">Simulate statewide demand and allocation coverage before publishing.</p>
+                    <div class="text-left space-y-3 text-xs">
                         <div>
-                            <h3 class="text-base font-heading font-bold text-slate-900">Kano State 44 Local Government Areas</h3>
-                            <p class="text-xs text-slate-500">State agricultural input quotas and designated zonal store hubs</p>
+                            <label class="block font-bold mb-1">Statewide Subsidy Pool (Bags):</label>
+                            <input id="sim-pool" type="number" class="swal2-input text-sm" value="50000">
                         </div>
-                        <input type="text" id="lgaSearchInput" oninput="filterLgaTable()" placeholder="Search LGA or Zone..." class="px-4 py-2 rounded-xl border border-slate-300 text-xs w-full sm:w-64">
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="p-4 rounded-2xl bg-kano-50 border border-kano-200">
-                            <span class="text-xs font-bold text-kano-900">Kano Central Belt (8 LGAs)</span>
-                            <div class="text-xs text-slate-600 mt-1">Depot: <strong>Dawanau Central Grain Depot</strong></div>
-                            <div class="text-xs text-slate-500 mt-0.5">Officers: Malam Aminu Bello (S001)</div>
+                        <div>
+                            <label class="block font-bold mb-1">Baseline Rate (Bags per Hectare):</label>
+                            <input id="sim-ha" type="number" step="0.5" class="swal2-input text-sm" value="2.0">
                         </div>
-                        <div class="p-4 rounded-2xl bg-kano-50 border border-kano-200">
-                            <span class="text-xs font-bold text-kano-900">Kano North Belt (13 LGAs)</span>
-                            <div class="text-xs text-slate-600 mt-1">Depot: <strong>Bichi Agro-Distribution Depot</strong></div>
-                            <div class="text-xs text-slate-500 mt-0.5">Officers: Hajiya Fatima Garba (S002)</div>
-                        </div>
-                        <div class="p-4 rounded-2xl bg-kano-50 border border-kano-200">
-                            <span class="text-xs font-bold text-kano-900">Kano South Belt (23 LGAs)</span>
-                            <div class="text-xs text-slate-600 mt-1">Depot: <strong>Rano & Kura Irrigation Depots</strong></div>
-                            <div class="text-xs text-slate-500 mt-0.5">Officers: Ibrahim Usman (S003)</div>
+                        <div>
+                            <label class="block font-bold mb-1">Rice / Wheat Priority Multiplier:</label>
+                            <input id="sim-mult" type="number" step="0.1" class="swal2-input text-sm" value="1.2">
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3" id="lgaGrid">
-                        ${KANO_44_LGAS.map((lga, i) => `
-                            <div class="lga-card p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-kano-700 hover:bg-kano-50 transition text-center cursor-pointer">
-                                <span class="text-[10px] font-bold text-slate-400 font-mono">#${i + 1}</span>
-                                <div class="font-heading font-bold text-slate-900 text-sm mt-0.5">${lga}</div>
-                                <span class="text-[10px] text-kano-900 font-semibold">Active Quota</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function filterLgaTable() {
-            const query = document.getElementById('lgaSearchInput').value.toLowerCase();
-            document.querySelectorAll('.lga-card').forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#046A38',
+                confirmButtonText: 'Run Simulation',
+                preConfirm: () => {
+                    return {
+                        total_pool: parseInt(document.getElementById('sim-pool').value) || 50000,
+                        bags_per_hectare: parseFloat(document.getElementById('sim-ha').value) || 2.0,
+                        rice_multiplier: parseFloat(document.getElementById('sim-mult').value) || 1.2
+                    };
+                }
             });
+
+            if (formValues) {
+                Swal.fire({ title: 'Simulating...', didOpen: () => Swal.showLoading() });
+                const res = await fetch('/api/allocate/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formValues)
+                });
+                const data = await res.json();
+                Swal.fire({
+                    title: 'Simulation Results',
+                    html: `
+                        <div class="text-left text-xs space-y-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                            <div><strong>Available Pool:</strong> ${data.simulated_pool.toLocaleString()} Bags</div>
+                            <div><strong>Total Farmer Demand:</strong> ${data.total_demand_bags.toLocaleString()} Bags</div>
+                            <div><strong>Statewide Coverage:</strong> <strong class="text-kano-900">${data.coverage_percentage}%</strong></div>
+                            <div><strong>Status:</strong> ${data.deficit_or_surplus >= 0 ? '<span class="text-emerald-700 font-bold">Adequate Stock Buffer</span>' : '<span class="text-amber-700 font-bold">Deficit: Restock Recommended</span>'}</div>
+                        </div>
+                    `,
+                    icon: 'info',
+                    confirmButtonColor: '#046A38'
+                });
+            }
         }
 
-        // 4. FARMERS REGISTRY (ADMIN)
-        async function loadFarmersRegistryView() {
+
+        // ====================================================
+        //  VIEW 7: FARMER PORTAL & REQUEST PLACEMENT
+        // ====================================================
+        async function loadFarmerPortalView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Enrolled Farmers...</div>';
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading My Applications & Allocations...</div>';
 
             try {
-                const res = await fetch('/api/farmers');
-                const farmers = await res.json();
+                const [reqRes, seaRes] = await Promise.all([
+                    fetch(`/api/requests/farmer/${currentUser.user_id}`),
+                    fetch('/api/seasons/active')
+                ]);
+                const reqs = await reqRes.json();
+                cachedSeasons = await seaRes.json();
+
+                const latestReq = reqs[reqs.length - 1];
 
                 container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-100">
-                            <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Enrolled Kano Farmers Directory</h3>
-                                <p class="text-xs text-slate-500">Total verified beneficiaries across Kano's 44 LGAs</p>
+                    <!-- Top Action Banner -->
+                    <div class="bg-gradient-to-r from-kano-950 to-kano-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                        <div>
+                            <span class="px-3 py-1 rounded-full bg-gold-500/20 text-gold-400 border border-gold-500/30 text-xs font-bold uppercase tracking-wider">Farmer Subsidy Service</span>
+                            <h2 class="text-2xl font-heading font-extrabold mt-2 text-white">Welcome, ${currentUser.name}!</h2>
+                            <p class="text-xs text-slate-300 mt-1">LGA: <strong>${currentUser.lga}</strong> &bull; Farm Size: <strong>${currentUser.farm_size || 2.5} ha</strong> &bull; Crop: <strong>${currentUser.crop_type || 'Rice & Wheat'}</strong></p>
+                        </div>
+
+                        <button onclick="openFarmerRequestModal()" class="px-7 py-3.5 rounded-2xl font-heading font-extrabold text-sm text-kano-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 transition-all transform hover:-translate-y-0.5 shadow-xl flex items-center gap-2 shrink-0">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Request Fertilizer Subsidy</span>
+                        </button>
+                    </div>
+
+                    ${latestReq ? `
+                        <!-- Active Pass & QR Voucher -->
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <div class="lg:col-span-7 bg-white rounded-3xl p-7 border border-slate-200 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                    <div>
+                                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Latest Allocation</span>
+                                        <h3 class="text-lg font-heading font-extrabold text-slate-900">${latestReq.season_name}</h3>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-extrabold ${latestReq.status === 'distributed' ? 'bg-emerald-100 text-emerald-900' : latestReq.status === 'allocated' ? 'bg-gold-100 text-gold-900' : 'bg-slate-100 text-slate-800'}">
+                                        ${latestReq.status.toUpperCase()}
+                                    </span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 text-xs">
+                                    <div><span class="text-slate-400">Allocated Quota:</span> <div class="text-2xl font-heading font-extrabold text-kano-900">${latestReq.allocated_bags || latestReq.requested_bags} Bags (50kg)</div></div>
+                                    <div><span class="text-slate-400">Fertilizer Type:</span> <div class="font-bold text-slate-700">${latestReq.fertilizer_type}</div></div>
+                                    <div><span class="text-slate-400">Subsidized Price:</span> <div class="font-bold text-emerald-700">₦${(latestReq.subsidized_price || 15000).toLocaleString()} / bag</div></div>
+                                    <div><span class="text-slate-400">Estimated Total:</span> <div class="font-bold text-slate-900">₦${((latestReq.allocated_bags || latestReq.requested_bags) * (latestReq.subsidized_price || 15000)).toLocaleString()}</div></div>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-kano-50 border border-kano-200 text-xs text-slate-700 space-y-1">
+                                    <div class="font-bold text-kano-950 flex items-center gap-1.5"><i class="fas fa-location-pin text-kano-900"></i> Collection Depot:</div>
+                                    <p>Present your QR code or 6-digit SMS OTP token at your Zonal Depot (Dawanau, Bichi, Rano, or Kura). Store officer will scan and dispense your bags.</p>
+                                </div>
+
+                                <div class="pt-2 flex flex-wrap gap-3">
+                                    <a href="/api/acknowledgement_slip/${latestReq.id}" target="_blank" class="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 transition flex items-center gap-2">
+                                        <i class="fas fa-print text-gold-400"></i> Print Official Slip
+                                    </a>
+                                    <button onclick="openSmsSimulator(${latestReq.id})" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5">
+                                        <i class="fas fa-sms text-kano-900"></i> View SMS Alert
+                                    </button>
+                                    ${!latestReq.acknowledged && latestReq.status === 'distributed' ? `
+                                        <button onclick="acknowledgeReceipt(${latestReq.id})" class="px-4 py-2.5 rounded-xl font-bold text-xs text-kano-900 bg-kano-100 hover:bg-kano-200 transition">
+                                            Confirm Physical Receipt
+                                        </button>
+                                    ` : ''}
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="openRegisterModal()" class="px-4 py-2 rounded-xl bg-kano-900 text-white font-bold text-xs hover:bg-kano-950 transition flex items-center gap-1.5">
-                                    <i class="fas fa-plus"></i> Enroll Farmer
-                                </button>
+
+                            <div class="lg:col-span-5 bg-gradient-to-br from-kano-950 to-slate-900 rounded-3xl p-7 text-white shadow-xl text-center space-y-4 border border-kano-900">
+                                <span class="text-[10px] font-bold tracking-widest uppercase text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20">Digital Collection Pass</span>
+                                
+                                <div class="bg-white p-4 rounded-2xl max-w-[190px] mx-auto shadow-xl">
+                                    ${latestReq.qr_image_base64 ? `<img src="${latestReq.qr_image_base64}" alt="QR Code" class="w-full">` : '<div class="py-12 text-slate-400 text-xs">Awaiting Allocation QR</div>'}
+                                </div>
+
+                                <div class="bg-black/30 p-3 rounded-2xl border border-white/10">
+                                    <div class="text-[11px] text-slate-400">Offline / SMS 6-Digit Pickup OTP:</div>
+                                    <div class="text-2xl font-mono font-extrabold tracking-widest text-gold-400 mt-0.5">${latestReq.sms_token || '549210'}</div>
+                                </div>
+                                <p class="text-[11px] text-slate-400">Works without smartphone or internet connectivity at all depots.</p>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- All My Requests History Table -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">My Subsidy Requests &amp; Applications History</h3>
+                                <p class="text-xs text-slate-500">Track all your dry and rainy season fertilizer applications</p>
                             </div>
                         </div>
 
@@ -1022,28 +2023,38 @@
                             <table class="w-full text-left text-xs">
                                 <thead>
                                     <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
-                                        <th class="py-3 px-3">Farmer ID</th>
-                                        <th class="py-3 px-3">Full Name</th>
-                                        <th class="py-3 px-3">Phone</th>
-                                        <th class="py-3 px-3">LGA / Ward</th>
-                                        <th class="py-3 px-3">Acreage / Crop</th>
-                                        <th class="py-3 px-3">Cooperative</th>
-                                        <th class="py-3 px-3 text-right">Lifetime Bags</th>
+                                        <th class="py-3 px-3">Req ID</th>
+                                        <th class="py-3 px-3">Season Programme</th>
+                                        <th class="py-3 px-3">Formulation</th>
+                                        <th class="py-3 px-3">Requested</th>
+                                        <th class="py-3 px-3">Allocated</th>
+                                        <th class="py-3 px-3">Status</th>
+                                        <th class="py-3 px-3 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
-                                    ${farmers.map(f => `
+                                    ${reqs.map(r => `
                                         <tr class="hover:bg-slate-50 transition">
-                                            <td class="py-3 px-3 font-mono font-bold text-kano-900">${f.id}</td>
-                                            <td class="py-3 px-3 font-bold text-slate-900">${f.name}</td>
-                                            <td class="py-3 px-3 text-slate-600">${f.phone}</td>
-                                            <td class="py-3 px-3 text-slate-700">${f.lga} <span class="text-slate-400 font-normal">(${f.ward})</span></td>
+                                            <td class="py-3 px-3 font-mono font-bold text-slate-600">#${r.id}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-900">${r.season_name}</td>
+                                            <td class="py-3 px-3 text-slate-600">${r.fertilizer_type}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-700">${r.requested_bags} Bags</td>
+                                            <td class="py-3 px-3 font-bold text-kano-900">${r.allocated_bags || 0} Bags</td>
                                             <td class="py-3 px-3">
-                                                <span class="font-bold text-slate-800">${f.farm_size} ha</span> &bull; 
-                                                <span class="text-slate-500">${f.crop_type}</span>
+                                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${r.status === 'distributed' ? 'bg-emerald-100 text-emerald-800' : r.status === 'allocated' ? 'bg-gold-100 text-gold-800' : 'bg-slate-100 text-slate-700'}">
+                                                    ${r.status.toUpperCase()}
+                                                </span>
                                             </td>
-                                            <td class="py-3 px-3 text-slate-600">${f.coop_name || '<span class="text-slate-400">None</span>'}</td>
-                                            <td class="py-3 px-3 text-right font-bold text-emerald-700">${f.total_bags_received} Bags</td>
+                                            <td class="py-3 px-3 text-right space-x-1">
+                                                ${r.status === 'pending' ? `
+                                                    <button onclick="cancelFarmerRequest(${r.id})" class="px-2.5 py-1 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[11px]">
+                                                        Cancel
+                                                    </button>
+                                                ` : ''}
+                                                <a href="/api/acknowledgement_slip/${r.id}" target="_blank" class="px-2.5 py-1 rounded-lg bg-kano-50 hover:bg-kano-100 text-kano-900 font-bold text-[11px] inline-flex items-center gap-1">
+                                                    <i class="fas fa-print"></i> Slip
+                                                </a>
+                                            </td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
@@ -1052,157 +2063,159 @@
                     </div>
                 `;
             } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to load farmers list.</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading portal: ${e.message}</div>`;
             }
         }
 
-        // 5. WAREHOUSE & DEPOTS
-        async function loadWarehouseView() {
-            const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Inventory Batches...</div>';
-
-            try {
-                const res = await fetch('/api/inventory');
-                const batches = await res.json();
-
-                container.innerHTML = `
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-                            <div>
-                                <h3 class="text-base font-heading font-bold text-slate-900">Kano Zonal Strategic Inventory</h3>
-                                <p class="text-xs text-slate-500">Active fertilizer batches stored at designated Kano depots</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                            ${batches.map(b => `
-                                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-kano-100 text-kano-900 uppercase">${b.batch_number}</span>
-                                        <span class="text-xs text-slate-400 font-mono">${b.unit}</span>
-                                    </div>
-                                    <h4 class="font-heading font-bold text-slate-900 text-sm">${b.fertilizer_type}</h4>
-                                    <div class="text-2xl font-extrabold text-kano-900">${b.quantity.toLocaleString()}</div>
-                                    <p class="text-[11px] text-slate-500"><i class="fas fa-location-dot text-slate-400 mr-1"></i> ${b.location}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading inventory.</div>`;
+        async function openFarmerRequestModal() {
+            const res = await fetch('/api/seasons/active');
+            cachedSeasons = await res.json();
+            const select = document.getElementById('reqSeasonSelect');
+            if (cachedSeasons.length > 0) {
+                select.innerHTML = cachedSeasons.map(s => `<option value="${s.id}">${s.name} (${s.fertilizer_type})</option>`).join('');
+            } else {
+                select.innerHTML = `<option value="1">2026 Kano Dry-Season Wheat & Rice Farming Subsidy Programme</option>`;
             }
+
+            document.getElementById('reqFarmerName').innerText = currentUser.name;
+            const fsize = currentUser.farm_size || 2.5;
+            document.getElementById('reqFarmSizeDisplay').innerText = `${fsize} ha`;
+            
+            // Calculate eligible quota: 2 bags/ha with max 12
+            const maxQuota = Math.max(1, Math.min(12, Math.round(fsize * 2.2)));
+            document.getElementById('reqMaxQuotaDisplay').innerText = `${maxQuota} Bags (50kg)`;
+            document.getElementById('reqBagsInput').value = maxQuota;
+
+            document.getElementById('farmerRequestModal').classList.remove('hidden');
         }
 
-        // 6. BLOCKCHAIN EXPLORER
-        async function loadBlockchainExplorerView() {
-            const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Querying Blockchain Nodes...</div>';
+        async function submitFarmerFertilizerRequest(e) {
+            e.preventDefault();
+            const payload = {
+                farmer_id: currentUser.user_id,
+                season_id: parseInt(document.getElementById('reqSeasonSelect').value) || 1,
+                requested_bags: parseInt(document.getElementById('reqBagsInput').value) || 6,
+                crop_type: currentUser.crop_type || 'Rice & Wheat'
+            };
 
-            try {
-                const [chainRes, verifyRes] = await Promise.all([
-                    fetch('/api/blockchain?chain=distribution'),
-                    fetch('/api/blockchain/verify?chain=distribution')
-                ]);
-                const chain = await chainRes.json();
-                const verify = await verifyRes.json();
-
-                container.innerHTML = `
-                    <!-- Verification Status Banner -->
-                    <div class="p-6 rounded-3xl ${verify.valid ? 'bg-gradient-to-r from-emerald-950 to-kano-900 border border-emerald-500/40 text-white' : 'bg-red-900 text-white'} shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl ${verify.valid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'} flex items-center justify-center text-2xl shrink-0">
-                                <i class="fas ${verify.valid ? 'fa-shield-check' : 'fa-triangle-exclamation'}"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-heading font-extrabold text-lg">${verify.valid ? 'Blockchain Cryptographic Integrity Intact' : 'Integrity Alert: Chain Tampered!'}</h3>
-                                <p class="text-xs ${verify.valid ? 'text-slate-300' : 'text-red-200'}">${verify.message}</p>
-                            </div>
-                        </div>
-                        <button onclick="testBlockchainIntegrity()" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-kano-950 hover:bg-slate-100 transition shadow">
-                            <i class="fas fa-rotate mr-1"></i> Re-Verify All Blocks
-                        </button>
-                    </div>
-
-                    <!-- Chain Timeline -->
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                        <h3 class="text-base font-heading font-bold text-slate-900">Block Sequence &bull; SHA-256 Ledger (${chain.length} Blocks)</h3>
-
-                        <div class="space-y-4">
-                            ${chain.map(block => `
-                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 font-mono text-xs space-y-2 hover:border-kano-700 transition">
-                                    <div class="flex items-center justify-between">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${block.block_index === 0 ? 'bg-purple-100 text-purple-900' : 'bg-kano-100 text-kano-900'}">
-                                            BLOCK #${block.block_index} ${block.block_index === 0 ? '(GENESIS)' : ''}
-                                        </span>
-                                        <span class="text-slate-400 text-[11px]">${block.timestamp}</span>
-                                    </div>
-                                    <div class="text-[11px] text-slate-600 break-all">
-                                        <strong class="text-slate-700">Hash:</strong> <span class="text-emerald-700 font-semibold">${block.hash}</span>
-                                    </div>
-                                    <div class="text-[11px] text-slate-400 break-all">
-                                        <strong>Prev Hash:</strong> ${block.previous_hash}
-                                    </div>
-                                    <div class="pt-2 border-t border-slate-200 font-sans text-xs text-slate-700">
-                                        <strong>Transactions:</strong>
-                                        <pre class="bg-slate-900 text-emerald-400 p-2.5 rounded-xl mt-1 text-[11px] font-mono overflow-x-auto">${JSON.stringify(block.transactions, null, 2)}</pre>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to query blockchain.</div>`;
-            }
-        }
-
-        async function testBlockchainIntegrity() {
-            Swal.fire({ title: 'Recalculating SHA-256 Hashes...', didOpen: () => Swal.showLoading() });
-            const res = await fetch('/api/blockchain/verify?chain=distribution');
-            const data = await res.json();
-            Swal.fire({
-                icon: data.valid ? 'success' : 'error',
-                title: data.valid ? 'Chain 100% Valid' : 'Tamper Detected!',
-                text: data.message
+            const res = await fetch('/api/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
-            loadBlockchainExplorerView();
+            const data = await res.json();
+            if (res.ok && data.success) {
+                document.getElementById('farmerRequestModal').classList.add('hidden');
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                Swal.fire({ icon: 'success', title: 'Application Submitted!', text: data.message, confirmButtonColor: '#046A38' });
+                loadFarmerPortalView();
+            } else {
+                Swal.fire({ icon: 'warning', title: 'Notice', text: data.message });
+            }
         }
 
-        // 7. AUDIT LOGS
-        async function loadAuditLogsView() {
-            const container = document.getElementById('sectionContainer');
-            const res = await fetch('/api/audit_logs');
-            const logs = await res.json();
+        async function cancelFarmerRequest(reqId) {
+            const confirmed = await Swal.fire({
+                title: 'Cancel Application?',
+                text: 'Are you sure you want to cancel this subsidy request?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, cancel request'
+            });
+            if (confirmed.isConfirmed) {
+                const res = await fetch(`/api/requests/${reqId}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    Swal.fire({ icon: 'success', text: data.message });
+                    loadFarmerPortalView();
+                } else {
+                    Swal.fire({ icon: 'error', text: data.message });
+                }
+            }
+        }
 
+        async function openSmsSimulator(requestId) {
+            Swal.fire({ title: 'Simulating SMS Dispatch...', didOpen: () => Swal.showLoading() });
+            const res = await fetch(`/api/sms_simulation/${requestId}`);
+            const data = await res.json();
+            Swal.close();
+
+            document.getElementById('smsHausaText').innerText = data.hausa_sms;
+            document.getElementById('smsEnglishText').innerText = data.english_sms;
+            document.getElementById('smsSimulatorModal').classList.remove('hidden');
+        }
+
+        async function acknowledgeReceipt(requestId) {
+            const res = await fetch('/api/acknowledge', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_id: requestId, farmer_id: currentUser.user_id })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                Swal.fire({ icon: 'success', title: 'Confirmed!', text: 'You have confirmed physical receipt of your fertilizer.' });
+                loadFarmerPortalView();
+            }
+        }
+
+
+        // ====================================================
+        //  VIEW 8: DIGITAL FARMER ID CARD
+        // ====================================================
+        function loadFarmerIdCardView() {
+            const container = document.getElementById('sectionContainer');
             container.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-heading font-bold text-slate-900 mb-4">Official Activity & Audit Trail</h3>
-                    <div class="divide-y divide-slate-100 text-xs">
-                        ${logs.map(log => `
-                            <div class="py-3 flex items-start justify-between gap-4">
-                                <div class="space-y-0.5">
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-bold text-slate-900">${log.actor_id}</span>
-                                        <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${log.actor_type}</span>
-                                        <span class="font-bold text-kano-900">${log.action}</span>
-                                    </div>
-                                    <p class="text-slate-600">${log.details}</p>
+                <div class="max-w-md mx-auto">
+                    <div class="bg-gradient-to-br from-kano-900 via-kano-800 to-slate-900 rounded-3xl p-6 text-white shadow-2xl border-2 border-gold-500/40 relative overflow-hidden">
+                        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-gold-500 text-kano-950 flex items-center justify-center font-bold text-sm">
+                                    <i class="fas fa-seedling"></i>
                                 </div>
-                                <span class="text-[11px] text-slate-400 whitespace-nowrap">${log.timestamp}</span>
+                                <div>
+                                    <h4 class="font-heading font-extrabold text-sm text-white leading-tight">KNARDA &bull; KANO STATE</h4>
+                                    <p class="text-[9px] text-gold-400 uppercase tracking-wider font-semibold">Official Smallholder Farmer Pass</p>
+                                </div>
                             </div>
-                        `).join('')}
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">VERIFIED</span>
+                        </div>
+
+                        <div class="mt-4 flex items-center gap-4">
+                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-gold-500 flex items-center justify-center text-3xl text-gold-400 shrink-0 shadow-md">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="truncate text-xs space-y-1">
+                                <div class="text-base font-heading font-bold text-white truncate">${currentUser.name}</div>
+                                <div class="font-mono text-gold-400 font-bold">${currentUser.user_id}</div>
+                                <div class="text-slate-300">LGA: <strong>${currentUser.lga || 'Kano'}</strong></div>
+                                <div class="text-slate-400 text-[10px]">Farm: ${currentUser.farm_size || 2.5} ha &bull; ${currentUser.crop_type || 'Rice & Wheat'}</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400">
+                            <div>NIN: <span class="font-mono text-slate-200">2345****012</span></div>
+                            <div class="text-gold-400 font-semibold">AFDAS Authenticated</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-5">
+                        <button onclick="window.print()" class="px-6 py-2.5 rounded-xl font-bold text-xs text-kano-900 bg-white border border-slate-300 hover:bg-slate-50 transition shadow-sm inline-flex items-center gap-2">
+                            <i class="fas fa-download"></i> Save / Print ID Card
+                        </button>
                     </div>
                 </div>
             `;
         }
 
-        // 8. STORE OFFICER: DISTRIBUTION TERMINAL (QR & SMS SCANNER)
+
+        // ====================================================
+        //  VIEW 9: STORE OFFICER TERMINAL & HISTORY
+        // ====================================================
         function loadDistributionTerminalView() {
             const container = document.getElementById('sectionContainer');
             container.innerHTML = `
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- Scanner / Verification Column -->
                     <div class="lg:col-span-6 space-y-6">
                         <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
                             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -1210,14 +2223,12 @@
                                 <span class="text-xs font-bold text-gold-600 bg-gold-50 px-2.5 py-1 rounded-full">Officer: ${currentUser.user_id}</span>
                             </div>
 
-                            <!-- Tabs: Camera, File, SMS Token, Manual -->
                             <div class="flex rounded-xl bg-slate-100 p-1 text-xs font-bold text-slate-600">
                                 <button onclick="setScannerMode('camera')" id="mode-camera" class="flex-1 py-2 rounded-lg bg-white text-kano-900 shadow-sm">Camera</button>
                                 <button onclick="setScannerMode('token')" id="mode-token" class="flex-1 py-2 rounded-lg hover:text-slate-900">SMS OTP</button>
                                 <button onclick="setScannerMode('manual')" id="mode-manual" class="flex-1 py-2 rounded-lg hover:text-slate-900">Manual / Hash</button>
                             </div>
 
-                            <!-- Camera Area -->
                             <div id="scannerCameraArea" class="space-y-3">
                                 <div id="reader" class="rounded-2xl overflow-hidden bg-slate-950 border border-slate-200 min-h-[240px]"></div>
                                 <div class="flex gap-2">
@@ -1230,7 +2241,6 @@
                                 </div>
                             </div>
 
-                            <!-- SMS Token Area -->
                             <div id="scannerTokenArea" class="hidden space-y-3">
                                 <label class="block text-xs font-bold text-slate-700 uppercase">Enter 6-Digit SMS Token</label>
                                 <input type="text" id="officerTokenInput" placeholder="e.g. 549210" maxlength="6" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-lg font-mono font-bold tracking-widest text-center focus:ring-2 focus:ring-kano-900">
@@ -1239,7 +2249,6 @@
                                 </button>
                             </div>
 
-                            <!-- Manual Hash Area -->
                             <div id="scannerManualArea" class="hidden space-y-3">
                                 <label class="block text-xs font-bold text-slate-700 uppercase">Paste QR Payload JSON or SHA-256 Hash</label>
                                 <textarea id="officerManualInput" rows="4" placeholder='{"request_id": 1, ...}' class="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs font-mono"></textarea>
@@ -1250,7 +2259,6 @@
                         </div>
                     </div>
 
-                    <!-- Verification Result & Dispense Action Column -->
                     <div class="lg:col-span-6">
                         <div id="verificationResultPanel" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center py-16 text-slate-400">
                             <i class="fas fa-qrcode text-4xl mb-3 text-slate-300"></i>
@@ -1269,11 +2277,7 @@
 
             ['camera', 'token', 'manual'].forEach(m => {
                 const btn = document.getElementById(`mode-${m}`);
-                if (m === mode) {
-                    btn.className = 'flex-1 py-2 rounded-lg bg-white text-kano-900 shadow-sm';
-                } else {
-                    btn.className = 'flex-1 py-2 rounded-lg hover:text-slate-900';
-                }
+                btn.className = (m === mode) ? 'flex-1 py-2 rounded-lg bg-white text-kano-900 shadow-sm' : 'flex-1 py-2 rounded-lg hover:text-slate-900';
             });
         }
 
@@ -1398,12 +2402,7 @@
                 const data = await res.json();
                 if (res.ok && data.success) {
                     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Dispensed & Sealed on Blockchain!',
-                        text: data.message,
-                        confirmButtonColor: '#046A38'
-                    });
+                    Swal.fire({ icon: 'success', title: 'Dispensed & Sealed on Blockchain!', text: data.message, confirmButtonColor: '#046A38' });
                     loadDistributionTerminalView();
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: data.message });
@@ -1413,244 +2412,203 @@
             }
         }
 
-        // 9. OFFICER HISTORY
         async function loadOfficerHistoryView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-heading font-bold text-slate-900 mb-4">Dispensing History &bull; Depot Distribution Log</h3>
-                    <p class="text-xs text-slate-500 mb-4">Official log of bags released by store officers at this depot center.</p>
-                    <div class="p-4 bg-slate-50 rounded-2xl text-xs text-slate-600">
-                        <i class="fas fa-info-circle text-kano-900 mr-1.5"></i> All physical collections are cryptographically verifiable on the state blockchain.
-                    </div>
-                </div>
-            `;
-        }
-
-        // 10. FARMER PORTAL (MY ALLOCATION & QR VOUCHER)
-        async function loadFarmerPortalView() {
-            const container = document.getElementById('sectionContainer');
-            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading My Allocation & Voucher...</div>';
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Loading Dispensing Log...</div>';
 
             try {
-                const res = await fetch(`/api/requests/farmer/${currentUser.user_id}`);
-                const reqs = await res.json();
-                const latestReq = reqs[reqs.length - 1];
-
-                if (!latestReq) {
-                    container.innerHTML = `
-                        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm text-center py-16 space-y-4">
-                            <div class="w-16 h-16 rounded-full bg-kano-100 text-kano-900 text-2xl flex items-center justify-center mx-auto">
-                                <i class="fas fa-file-pen"></i>
-                            </div>
-                            <h3 class="text-lg font-heading font-extrabold text-slate-900">No Subsidy Application Found</h3>
-                            <p class="text-xs text-slate-500 max-w-sm mx-auto">You have not applied for the 2026 dry-season fertilizer subsidy programme yet.</p>
-                            <button onclick="switchTab('farmer-apply')" class="px-6 py-3 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 transition">
-                                Apply for Subsidy
-                            </button>
-                        </div>
-                    `;
-                    return;
-                }
+                const res = await fetch(`/api/distributions/officer/${currentUser.user_id}`);
+                const history = await res.json();
 
                 container.innerHTML = `
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- Left: Allocation Card -->
-                        <div class="lg:col-span-7 bg-white rounded-3xl p-7 border border-slate-200 shadow-sm space-y-5">
-                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                                <div>
-                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Programme</span>
-                                    <h3 class="text-lg font-heading font-extrabold text-slate-900">${latestReq.season_name}</h3>
-                                </div>
-                                <span class="px-3 py-1 rounded-full text-xs font-extrabold ${latestReq.status === 'distributed' ? 'bg-emerald-100 text-emerald-900' : latestReq.status === 'allocated' ? 'bg-gold-100 text-gold-900' : 'bg-slate-100 text-slate-800'}">
-                                    ${latestReq.status.toUpperCase()}
-                                </span>
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-heading font-bold text-slate-900">Officer Dispensing History &bull; ${currentUser.name}</h3>
+                                <p class="text-xs text-slate-500">Official log of bags released by store officers at this depot center</p>
                             </div>
-
-                            <div class="grid grid-cols-2 gap-4 text-xs">
-                                <div><span class="text-slate-400">Beneficiary:</span> <div class="font-bold text-slate-900 text-sm">${currentUser.name}</div></div>
-                                <div><span class="text-slate-400">Farmer ID:</span> <div class="font-mono font-bold text-kano-900">${currentUser.user_id}</div></div>
-                                <div><span class="text-slate-400">Allocated Quota:</span> <div class="text-2xl font-heading font-extrabold text-kano-900">${latestReq.allocated_bags} Bags (50kg)</div></div>
-                                <div><span class="text-slate-400">Formulation:</span> <div class="font-bold text-slate-700">${latestReq.fertilizer_type}</div></div>
-                            </div>
-
-                            <!-- Pickup instructions -->
-                            <div class="p-4 rounded-2xl bg-kano-50 border border-kano-200 text-xs text-slate-700 space-y-1.5">
-                                <div class="font-bold text-kano-950 flex items-center gap-1.5">
-                                    <i class="fas fa-location-pin text-kano-900"></i> Collection Depot:
-                                </div>
-                                <p>Take your QR Code or SMS OTP to your designated Kano Zonal Depot (Dawanau, Bichi, Rano, or Kura). The store officer will scan and release your bags.</p>
-                            </div>
-
-                            <div class="pt-2 flex gap-3">
-                                <a href="/api/acknowledgement_slip/${latestReq.id}" target="_blank" class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 transition inline-flex items-center gap-2">
-                                    <i class="fas fa-print text-gold-400"></i> Print Official Collection Slip
-                                </a>
-                                ${!latestReq.acknowledged && latestReq.status === 'distributed' ? `
-                                    <button onclick="acknowledgeReceipt(${latestReq.id})" class="px-5 py-2.5 rounded-xl font-bold text-xs text-kano-900 bg-kano-100 hover:bg-kano-200 transition">
-                                        Confirm Physical Receipt
-                                    </button>
-                                ` : ''}
-                            </div>
+                            <span class="text-xs font-bold text-kano-900 bg-kano-50 px-3 py-1 rounded-full">${history.length} Dispensed Orders</span>
                         </div>
 
-                        <!-- Right: Digital QR & SMS Voucher -->
-                        <div class="lg:col-span-5 bg-gradient-to-br from-kano-950 to-slate-900 rounded-3xl p-7 text-white shadow-xl text-center space-y-4 border border-kano-900">
-                            <span class="text-[10px] font-bold tracking-widest uppercase text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20">Digital Collection Pass</span>
-                            
-                            <div class="bg-white p-4 rounded-2xl max-w-[200px] mx-auto shadow-xl">
-                                ${latestReq.qr_image_base64 ? `<img src="${latestReq.qr_image_base64}" alt="QR Code" class="w-full">` : '<div class="py-12 text-slate-400 text-xs">Awaiting Allocation QR</div>'}
-                            </div>
-
-                            <div class="bg-black/30 p-3 rounded-2xl border border-white/10">
-                                <div class="text-[11px] text-slate-400">Offline / SMS 6-Digit Pickup Token:</div>
-                                <div class="text-2xl font-mono font-extrabold tracking-widest text-gold-400 mt-0.5">${latestReq.sms_token || '------'}</div>
-                            </div>
-
-                            <p class="text-[11px] text-slate-400">Present this QR code or 6-digit token to the Store Officer at the collection center.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 font-bold uppercase border-b border-slate-100">
+                                        <th class="py-3 px-3">Req ID</th>
+                                        <th class="py-3 px-3">Farmer</th>
+                                        <th class="py-3 px-3">LGA</th>
+                                        <th class="py-3 px-3">Phone</th>
+                                        <th class="py-3 px-3">Bags Released</th>
+                                        <th class="py-3 px-3">Dispensed At</th>
+                                        <th class="py-3 px-3 text-right">Slip</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${history.map(h => `
+                                        <tr class="hover:bg-slate-50 transition">
+                                            <td class="py-3 px-3 font-mono text-slate-600">#${h.id}</td>
+                                            <td class="py-3 px-3 font-bold text-slate-900">${h.farmer_name}</td>
+                                            <td class="py-3 px-3 text-slate-700">${h.lga}</td>
+                                            <td class="py-3 px-3 text-slate-600">${h.farmer_phone}</td>
+                                            <td class="py-3 px-3 font-bold text-kano-900">${h.allocated_bags} Bags</td>
+                                            <td class="py-3 px-3 text-slate-400 font-mono text-[11px]">${h.distributed_at ? h.distributed_at.substring(0, 16).replace('T', ' ') : 'N/A'}</td>
+                                            <td class="py-3 px-3 text-right">
+                                                <a href="/api/acknowledgement_slip/${h.id}" target="_blank" class="text-kano-900 font-bold hover:underline">
+                                                    <i class="fas fa-print"></i> Slip
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 `;
             } catch(e) {
-                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading allocation.</div>`;
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Error loading history.</div>`;
             }
         }
 
-        async function acknowledgeReceipt(requestId) {
-            const res = await fetch('/api/acknowledge', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ request_id: requestId, farmer_id: currentUser.user_id })
-            });
-            const data = await res.json();
-            if (res.ok && data.success) {
-                Swal.fire({ icon: 'success', title: 'Confirmed!', text: 'You have acknowledged physical receipt of your fertilizer.' });
-                loadFarmerPortalView();
-            }
-        }
 
-        // 11. DIGITAL FARMER ID CARD
-        function loadFarmerIdCardView() {
+        // ====================================================
+        //  VIEW 10: BLOCKCHAIN EXPLORER & TAMPER DEMO
+        // ====================================================
+        async function loadBlockchainExplorerView() {
             const container = document.getElementById('sectionContainer');
-            container.innerHTML = `
-                <div class="max-w-md mx-auto">
-                    <!-- Digital Identity Badge -->
-                    <div class="bg-gradient-to-br from-kano-900 via-kano-800 to-slate-900 rounded-3xl p-6 text-white shadow-2xl border-2 border-gold-500/40 relative overflow-hidden">
-                        <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-8 h-8 rounded-lg bg-gold-500 text-kano-950 flex items-center justify-center font-bold text-sm">
-                                    <i class="fas fa-seedling"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-heading font-extrabold text-sm text-white leading-tight">KNARDA &bull; KANO STATE</h4>
-                                    <p class="text-[9px] text-gold-400 uppercase tracking-wider font-semibold">Official Smallholder Farmer Pass</p>
-                                </div>
-                            </div>
-                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">VERIFIED</span>
-                        </div>
-
-                        <div class="mt-4 flex items-center gap-4">
-                            <div class="w-20 h-20 rounded-2xl bg-slate-800 border-2 border-gold-500 flex items-center justify-center text-3xl text-gold-400 shrink-0 shadow-md">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="truncate text-xs space-y-1">
-                                <div class="text-base font-heading font-bold text-white truncate">${currentUser.name}</div>
-                                <div class="font-mono text-gold-400 font-bold">${currentUser.user_id}</div>
-                                <div class="text-slate-300">LGA: <strong>${currentUser.lga || 'Kano'}</strong></div>
-                                <div class="text-slate-400 text-[10px]">Farm: ${currentUser.farm_size || 2.5} ha &bull; ${currentUser.crop_type || 'Rice & Wheat'}</div>
-                            </div>
-                        </div>
-
-                        <div class="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400">
-                            <div>NIN: <span class="font-mono text-slate-200">2345****012</span></div>
-                            <div class="text-gold-400 font-semibold">AFDAS Authenticated</div>
-                        </div>
-                    </div>
-
-                    <div class="text-center mt-5">
-                        <button onclick="window.print()" class="px-6 py-2.5 rounded-xl font-bold text-xs text-kano-900 bg-white border border-slate-300 hover:bg-slate-50 transition shadow-sm inline-flex items-center gap-2">
-                            <i class="fas fa-download"></i> Save / Print ID Card
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // 12. FARMER SUBSIDY APPLICATION
-        function loadFarmerApplyView() {
-            const container = document.getElementById('sectionContainer');
-            container.innerHTML = `
-                <div class="max-w-xl mx-auto bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                    <h3 class="text-lg font-heading font-extrabold text-slate-900 mb-2">Apply for Fertilizer Subsidy</h3>
-                    <p class="text-xs text-slate-500 mb-6">Submit your dry-season or wet-season farming requirements for algorithmic quota allocation.</p>
-
-                    <form id="applySubsidyForm" onsubmit="handleFarmerSubmitRequest(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Select Season Programme</label>
-                            <select id="applySeasonSelect" required class="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs font-medium">
-                                <option value="1">2026 Kano Dry-Season Wheat & Rice Farming Subsidy Allocation</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Requested Number of Bags (50kg)</label>
-                            <input type="number" id="applyBagsInput" min="1" max="15" value="6" required class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium">
-                            <small class="text-[10px] text-slate-500">Allocation will be evaluated against verified farm acreage.</small>
-                        </div>
-
-                        <div class="pt-4">
-                            <button type="submit" class="w-full py-3.5 rounded-xl font-heading font-bold text-xs text-white bg-kano-900 hover:bg-kano-950 transition shadow-md">
-                                Submit Allocation Request
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            `;
-        }
-
-        async function handleFarmerSubmitRequest(e) {
-            e.preventDefault();
-            const seasonId = parseInt(document.getElementById('applySeasonSelect').value) || 1;
-            const requestedBags = parseInt(document.getElementById('applyBagsInput').value) || 4;
+            container.innerHTML = '<div class="py-12 text-center text-slate-400"><i class="fas fa-spinner fa-spin text-2xl"></i> Querying Blockchain Nodes...</div>';
 
             try {
-                const res = await fetch('/api/requests', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        farmer_id: currentUser.user_id,
-                        season_id: seasonId,
-                        requested_bags: requestedBags
-                    })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Request Submitted!',
-                        text: data.message,
-                        confirmButtonColor: '#046A38'
-                    });
-                    switchTab('farmer-portal');
-                } else {
-                    Swal.fire({ icon: 'warning', title: 'Submission Notice', text: data.message });
-                }
+                const [chainRes, verifyRes] = await Promise.all([
+                    fetch('/api/blockchain?chain=distribution'),
+                    fetch('/api/blockchain/verify?chain=distribution')
+                ]);
+                const chain = await chainRes.json();
+                const verify = await verifyRes.json();
+
+                container.innerHTML = `
+                    <div class="p-6 rounded-3xl ${verify.valid ? 'bg-gradient-to-r from-emerald-950 to-kano-900 border border-emerald-500/40 text-white' : 'bg-red-900 text-white'} shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl ${verify.valid ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'} flex items-center justify-center text-2xl shrink-0">
+                                <i class="fas ${verify.valid ? 'fa-shield-check' : 'fa-triangle-exclamation'}"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-heading font-extrabold text-lg">${verify.valid ? 'Blockchain Cryptographic Integrity Intact' : 'Integrity Alert: Chain Tampered!'}</h3>
+                                <p class="text-xs ${verify.valid ? 'text-slate-300' : 'text-red-200'}">${verify.message}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="testBlockchainIntegrity()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-white text-kano-950 hover:bg-slate-100 transition shadow">
+                                <i class="fas fa-rotate mr-1"></i> Re-Verify
+                            </button>
+                            <button onclick="simulateTamperDemo()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white transition shadow" title="Demonstrate how hashing detects fraud">
+                                <i class="fas fa-bug mr-1"></i> Simulate Tamper
+                            </button>
+                            <button onclick="repairBlockchain()" class="px-4 py-2.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white transition shadow" title="Re-seal chain hashes">
+                                <i class="fas fa-wrench mr-1"></i> Restore Chain
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-base font-heading font-bold text-slate-900">Block Sequence &bull; SHA-256 Ledger (${chain.length} Blocks)</h3>
+                        <div class="space-y-4">
+                            ${chain.map(block => `
+                                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 font-mono text-xs space-y-2 hover:border-kano-700 transition">
+                                    <div class="flex items-center justify-between">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${block.block_index === 0 ? 'bg-purple-100 text-purple-900' : 'bg-kano-100 text-kano-900'}">
+                                            BLOCK #${block.block_index} ${block.block_index === 0 ? '(GENESIS)' : ''}
+                                        </span>
+                                        <span class="text-slate-400 text-[11px]">${block.timestamp}</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-600 break-all">
+                                        <strong class="text-slate-700">Hash:</strong> <span class="text-emerald-700 font-semibold">${block.hash}</span>
+                                    </div>
+                                    <div class="text-[11px] text-slate-400 break-all">
+                                        <strong>Prev Hash:</strong> ${block.previous_hash}
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-200 font-sans text-xs text-slate-700">
+                                        <strong>Transactions:</strong>
+                                        <pre class="bg-slate-900 text-emerald-400 p-2.5 rounded-xl mt-1 text-[11px] font-mono overflow-x-auto">${JSON.stringify(block.transactions, null, 2)}</pre>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
             } catch(e) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Could not submit request.' });
+                container.innerHTML = `<div class="p-6 bg-red-50 text-red-700 rounded-2xl">Failed to query blockchain.</div>`;
             }
+        }
+
+        async function testBlockchainIntegrity() {
+            Swal.fire({ title: 'Recalculating SHA-256 Hashes...', didOpen: () => Swal.showLoading() });
+            const res = await fetch('/api/blockchain/verify?chain=distribution');
+            const data = await res.json();
+            Swal.fire({
+                icon: data.valid ? 'success' : 'error',
+                title: data.valid ? 'Chain 100% Valid' : 'Tamper Detected!',
+                text: data.message
+            });
+            loadBlockchainExplorerView();
+        }
+
+        async function simulateTamperDemo() {
+            const res = await fetch('/api/blockchain/simulate_tamper', { method: 'POST' });
+            const data = await res.json();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tamper Simulation Active',
+                text: data.message
+            });
+            loadBlockchainExplorerView();
+        }
+
+        async function repairBlockchain() {
+            const res = await fetch('/api/blockchain/repair', { method: 'POST' });
+            const data = await res.json();
+            Swal.fire({
+                icon: 'success',
+                title: 'Chain Restored',
+                text: data.message
+            });
+            loadBlockchainExplorerView();
+        }
+
+
+        // ====================================================
+        //  VIEW 11: AUDIT LOGS
+        // ====================================================
+        async function loadAuditLogsView() {
+            const container = document.getElementById('sectionContainer');
+            const res = await fetch('/api/audit_logs');
+            const logs = await res.json();
+
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-heading font-bold text-slate-900 mb-4">Official Activity & Audit Trail</h3>
+                    <div class="divide-y divide-slate-100 text-xs">
+                        ${logs.map(log => `
+                            <div class="py-3 flex items-start justify-between gap-4">
+                                <div class="space-y-0.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-slate-900">${log.actor_id}</span>
+                                        <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${log.actor_type}</span>
+                                        <span class="font-bold text-kano-900">${log.action}</span>
+                                    </div>
+                                    <p class="text-slate-600">${log.details}</p>
+                                </div>
+                                <span class="text-[11px] text-slate-400 whitespace-nowrap">${log.timestamp}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         // Modal Helpers
-        function openRegisterModal() {
-            document.getElementById('registerModal').classList.remove('hidden');
-        }
-        function closeRegisterModal() {
-            document.getElementById('registerModal').classList.add('hidden');
-        }
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('hidden');
-        }
+        function openRegisterModal() { document.getElementById('registerModal').classList.remove('hidden'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.add('hidden'); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
     </script>
 </body>
 </html>
